@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
 const portfolio = [
   { id: 1, title: 'The Grand Botanica', category: 'Wedding', img: '/gallery-1.jpg' },
@@ -21,36 +22,37 @@ export default function Gallery() {
 
         <div className="grid grid-cols-2">
           {portfolio.map((item, idx) => (
-            <motion.div 
-              key={item.id}
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: idx * 0.1 }}
-              className="gallery-item"
-              style={{ position: 'relative', overflow: 'hidden', cursor: 'pointer', borderRadius: '4px' }}
-            >
-              <img 
-                src={item.img} 
-                alt={item.title} 
-                style={{ width: '100%', height: '500px', objectFit: 'cover', transition: 'var(--transition-smooth)' }} 
-                className="gallery-img"
-              />
-              <div className="gallery-overlay" style={{
-                position: 'absolute',
-                inset: 0,
-                backgroundColor: 'rgba(0,0,0,0.4)',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'flex-end',
-                padding: '2rem',
-                opacity: 0,
-                transition: 'var(--transition-smooth)'
-              }}>
-                <span style={{ color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '2px', fontSize: '0.8rem', marginBottom: '0.5rem' }}>{item.category}</span>
-                <h3 style={{ color: '#fff', fontSize: '1.75rem', fontFamily: 'var(--font-heading)' }}>{item.title}</h3>
-              </div>
-            </motion.div>
+            <Link to={`/quote?inspiration=${encodeURIComponent(item.title)}`} key={item.id}>
+              <motion.div 
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, delay: idx * 0.1 }}
+                className="gallery-item"
+                style={{ position: 'relative', overflow: 'hidden', cursor: 'pointer', borderRadius: '4px' }}
+              >
+                <img 
+                  src={item.img} 
+                  alt={item.title} 
+                  style={{ width: '100%', height: '500px', objectFit: 'cover', transition: 'var(--transition-smooth)' }} 
+                  className="gallery-img"
+                />
+                <div className="gallery-overlay" style={{
+                  position: 'absolute',
+                  inset: 0,
+                  backgroundColor: 'rgba(0,0,0,0.4)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'flex-end',
+                  padding: '2rem',
+                  opacity: 0,
+                  transition: 'var(--transition-smooth)'
+                }}>
+                  <span style={{ color: 'var(--color-accent)', textTransform: 'uppercase', letterSpacing: '2px', fontSize: '0.8rem', marginBottom: '0.5rem' }}>{item.category}</span>
+                  <h3 style={{ color: '#fff', fontSize: '1.75rem', fontFamily: 'var(--font-heading)' }}>{item.title}</h3>
+                </div>
+              </motion.div>
+            </Link>
           ))}
         </div>
       </div>
