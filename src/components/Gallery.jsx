@@ -1,7 +1,10 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { supabase } from '../lib/supabase';
 
-const portfolio = [
+// Fallback items just in case the database is empty or failing
+const fallbackPortfolio = [
   { id: 1, title: 'The Grand Botanica', category: 'Wedding', img: '/gallery-1.jpg' },
   { id: 2, title: 'Tech Gala 2024', category: 'Corporate', img: '/gallery-2.jpg' },
   { id: 3, title: 'Golden Jubilee', category: 'Birthday', img: '/gallery-3.jpg' },
@@ -9,6 +12,23 @@ const portfolio = [
 ];
 
 export default function Gallery() {
+  const [portfolio, setPortfolio] = useState(fallbackPortfolio);
+
+  useEffect(() => {
+    const fetchGallery = async () => {
+      try {
+        const { data, error } = await supabase.from('gallery').select('*').order('created_at', { ascending: false });
+        if (data && data.length > 0) {
+          setPortfolio(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch gallery from Supabase', error);
+      }
+    };
+    
+    fetchGallery();
+  }, []);
+
   return (
     <section id="gallery" className="section-padding" style={{ backgroundColor: 'var(--color-bg)' }}>
       <div className="container">
