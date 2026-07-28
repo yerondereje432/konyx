@@ -40,8 +40,8 @@ export default function Login({ setSession }) {
       padding: '2rem'
     }}>
       
-      {/* Dark Overlay with Blur */}
-      <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.65)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }} />
+      {/* Dark Overlay with subtle blur so the image remains recognizable */}
+      <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.4)', backdropFilter: 'blur(2px)', WebkitBackdropFilter: 'blur(2px)' }} />
 
       <motion.div 
         initial={{ opacity: 0, y: 30 }}
