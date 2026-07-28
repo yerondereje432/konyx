@@ -32,7 +32,7 @@ export default function Navbar() {
     <header className={navClass} style={{ paddingLeft: '2rem', paddingRight: '2rem', position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, transition: 'var(--transition-smooth)' }}>
       <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 0' }}>
         <Link to="/" style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', fontWeight: 700, letterSpacing: '2px', color: scrolled || !isHome ? 'var(--color-text)' : '#fff' }}>
-          AURA<span style={{ color: 'var(--color-accent)' }}>DECOR</span>
+          MJ<span style={{ color: 'var(--color-accent)' }}>DECOR</span>
         </Link>
 
         {/* Desktop Nav */}
