@@ -63,27 +63,26 @@ export default function Dashboard({ session }) {
   };
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#0A0A0A', color: '#E5E7EB', fontFamily: 'var(--font-body)' }}>
+    <div className="admin-layout" style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#0A0A0A', color: '#E5E7EB', fontFamily: 'var(--font-body)' }}>
       
       {/* Sidebar */}
-      <aside style={{ width: '280px', backgroundColor: '#111111', borderRight: '1px solid #1F1F1F', display: 'flex', flexDirection: 'column', position: 'fixed', height: '100vh', zIndex: 10 }}>
-        <div style={{ padding: '2.5rem 2rem' }}>
+      <aside className="admin-sidebar" style={{ width: '280px', backgroundColor: '#111111', borderRight: '1px solid #1F1F1F', display: 'flex', flexDirection: 'column', position: 'fixed', height: '100vh', zIndex: 10 }}>
+        <div className="sidebar-header" style={{ padding: '2.5rem 2rem' }}>
           <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', margin: 0, color: '#FFF', letterSpacing: '2px' }}>
             AURA<span style={{ color: 'var(--color-accent)' }}>ADMIN</span>
           </h1>
-          <p style={{ color: '#666', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '1px', marginTop: '0.5rem' }}>VIP Dashboard</p>
+          <p className="sidebar-subtitle" style={{ color: '#666', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '1px', marginTop: '0.5rem', margin: 0 }}>VIP Dashboard</p>
         </div>
 
-        <nav style={{ flex: 1, padding: '0 1rem' }}>
+        <nav className="sidebar-nav" style={{ flex: 1, padding: '0 1rem' }}>
           <button style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', backgroundColor: '#1A1A1A', color: 'var(--color-accent)', border: '1px solid #2A2A2A', borderRadius: '8px', cursor: 'pointer', fontSize: '0.95rem', fontWeight: 600 }}>
             <LayoutDashboard size={18} /> Inquiries
           </button>
-          {/* Future Sidebar Items can go here */}
         </nav>
 
-        <div style={{ padding: '2rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem', padding: '1rem', backgroundColor: '#1A1A1A', borderRadius: '8px' }}>
-            <div style={{ width: '35px', height: '35px', borderRadius: '50%', backgroundColor: 'var(--color-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+        <div className="sidebar-footer" style={{ padding: '2rem' }}>
+          <div className="user-info" style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem', padding: '1rem', backgroundColor: '#1A1A1A', borderRadius: '8px' }}>
+            <div style={{ width: '35px', height: '35px', borderRadius: '50%', backgroundColor: 'var(--color-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', flexShrink: 0 }}>
               <User size={18} />
             </div>
             <div style={{ overflow: 'hidden' }}>
@@ -91,24 +90,24 @@ export default function Dashboard({ session }) {
               <p style={{ margin: 0, fontSize: '0.75rem', color: '#666', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{session?.user?.email}</p>
             </div>
           </div>
-          <button onClick={handleSignOut} style={{ width: '100%', padding: '0.75rem', backgroundColor: 'transparent', border: '1px solid #333', color: '#888', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', transition: 'all 0.3s' }} onMouseOver={(e) => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = '#555'; }} onMouseOut={(e) => { e.currentTarget.style.color = '#888'; e.currentTarget.style.borderColor = '#333'; }}>
-            <LogOut size={16} /> Secure Logout
+          <button onClick={handleSignOut} className="logout-btn" style={{ width: '100%', padding: '0.75rem', backgroundColor: 'transparent', border: '1px solid #333', color: '#888', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', transition: 'all 0.3s' }} onMouseOver={(e) => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = '#555'; }} onMouseOut={(e) => { e.currentTarget.style.color = '#888'; e.currentTarget.style.borderColor = '#333'; }}>
+            <LogOut size={16} /> <span className="logout-text">Secure Logout</span>
           </button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main style={{ marginLeft: '280px', flex: 1, padding: '3rem 4rem', position: 'relative' }}>
+      <main className="admin-main" style={{ marginLeft: '280px', flex: 1, padding: '3rem 4rem', position: 'relative', width: '100%' }}>
         
         {/* Header Area */}
-        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '3rem' }}>
+        <header className="admin-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '3rem' }}>
           <div>
             <motion.h2 initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} style={{ fontFamily: 'var(--font-heading)', fontSize: '2.5rem', color: '#FFF', margin: '0 0 0.5rem 0' }}>Overview</motion.h2>
             <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} style={{ color: '#888', margin: 0 }}>Review and manage your incoming event styling requests.</motion.p>
           </div>
           
           {/* Quick Filters */}
-          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ display: 'flex', gap: '0.5rem', backgroundColor: '#111', padding: '0.5rem', borderRadius: '8px', border: '1px solid #222' }}>
+          <motion.div className="admin-filters" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ display: 'flex', gap: '0.5rem', backgroundColor: '#111', padding: '0.5rem', borderRadius: '8px', border: '1px solid #222' }}>
             {['All', 'Wedding', 'Corporate', 'Birthday'].map(f => (
               <button 
                 key={f} 
@@ -122,7 +121,7 @@ export default function Dashboard({ session }) {
         </header>
 
         {/* Stats Row */}
-        <motion.div variants={containerVariants} initial="hidden" animate="show" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem', marginBottom: '3rem' }}>
+        <motion.div className="admin-stats" variants={containerVariants} initial="hidden" animate="show" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem', marginBottom: '3rem' }}>
           {[
             { title: 'Total Inquiries', value: totalQuotes, icon: <Inbox size={24} color="var(--color-accent)" />, spark: '+12% this month' },
             { title: 'New This Week', value: thisWeek, icon: <TrendingUp size={24} color="#10B981" />, spark: 'Hot streak' },
@@ -130,7 +129,7 @@ export default function Dashboard({ session }) {
           ].map((stat, idx) => (
             <motion.div key={idx} variants={itemVariants} style={{ backgroundColor: '#111', border: '1px solid #1F1F1F', borderRadius: '12px', padding: '1.5rem', position: 'relative', overflow: 'hidden' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-                <h3 style={{ fontSize: '0.9rem', color: '#888', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '1px' }}>{stat.title}</h3>
+                <h3 style={{ fontSize: '0.9rem', color: '#888', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '1px', margin: 0 }}>{stat.title}</h3>
                 <div style={{ backgroundColor: '#1A1A1A', padding: '0.5rem', borderRadius: '8px' }}>{stat.icon}</div>
               </div>
               <div style={{ fontSize: '2.5rem', fontFamily: 'var(--font-heading)', color: '#FFF', lineHeight: 1, marginBottom: '0.5rem' }}>{stat.value}</div>
@@ -142,7 +141,7 @@ export default function Dashboard({ session }) {
 
         {/* Quotes List */}
         <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h3 style={{ fontSize: '1.2rem', color: '#FFF', fontFamily: 'var(--font-heading)' }}>Recent Requests</h3>
+          <h3 style={{ fontSize: '1.2rem', color: '#FFF', fontFamily: 'var(--font-heading)', margin: 0 }}>Recent Requests</h3>
           <span style={{ fontSize: '0.85rem', color: '#666' }}>Showing {filteredQuotes.length} results</span>
         </div>
 
@@ -151,7 +150,7 @@ export default function Dashboard({ session }) {
         ) : filteredQuotes.length === 0 ? (
           <div style={{ backgroundColor: '#111', border: '1px dashed #222', padding: '4rem', textAlign: 'center', borderRadius: '12px', color: '#666' }}>
             <Inbox size={48} style={{ margin: '0 auto 1rem auto', opacity: 0.2 }} />
-            <p>No inquiries found for this category.</p>
+            <p style={{ margin: 0 }}>No inquiries found for this category.</p>
           </div>
         ) : (
           <motion.div variants={containerVariants} initial="hidden" animate="show" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -161,13 +160,14 @@ export default function Dashboard({ session }) {
                   key={quote.id} 
                   variants={itemVariants}
                   exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
+                  className="quote-row"
                   style={{ backgroundColor: '#111', border: '1px solid #1F1F1F', borderRadius: '12px', padding: '2rem', display: 'grid', gridTemplateColumns: '2fr 1.5fr 1.5fr auto', gap: '2rem', alignItems: 'center', transition: 'border-color 0.3s', position: 'relative' }}
                   onMouseOver={(e) => e.currentTarget.style.borderColor = '#333'}
                   onMouseOut={(e) => e.currentTarget.style.borderColor = '#1F1F1F'}
                 >
                   
                   {/* Column 1: Client Info */}
-                  <div>
+                  <div className="quote-col">
                     <div style={{ display: 'inline-block', backgroundColor: 'rgba(197, 168, 128, 0.1)', color: 'var(--color-accent)', padding: '0.25rem 0.75rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '1rem' }}>
                       {quote.event_type}
                     </div>
@@ -179,7 +179,7 @@ export default function Dashboard({ session }) {
                   </div>
 
                   {/* Column 2: Event Details */}
-                  <div style={{ borderLeft: '1px solid #222', paddingLeft: '2rem' }}>
+                  <div className="quote-col quote-border" style={{ borderLeft: '1px solid #222', paddingLeft: '2rem' }}>
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', marginBottom: '1rem' }}>
                       <Calendar size={18} color="#666" style={{ marginTop: '2px' }} />
                       <div>
@@ -197,7 +197,7 @@ export default function Dashboard({ session }) {
                   </div>
 
                   {/* Column 3: Package & Budget */}
-                  <div style={{ borderLeft: '1px solid #222', paddingLeft: '2rem' }}>
+                  <div className="quote-col quote-border" style={{ borderLeft: '1px solid #222', paddingLeft: '2rem' }}>
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', marginBottom: '1rem' }}>
                       <Package size={18} color="#666" style={{ marginTop: '2px' }} />
                       <div>
@@ -215,7 +215,7 @@ export default function Dashboard({ session }) {
                   </div>
 
                   {/* Column 4: Actions */}
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '1rem' }}>
+                  <div className="quote-actions" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '1rem' }}>
                     <span style={{ fontSize: '0.7rem', color: '#555' }}>{new Date(quote.created_at).toLocaleDateString()}</span>
                     <button 
                       onClick={() => deleteQuote(quote.id)}
@@ -243,6 +243,63 @@ export default function Dashboard({ session }) {
           </motion.div>
         )}
       </main>
+      
+      <style>{`
+        @media (max-width: 1024px) {
+          .admin-sidebar { width: 240px !important; }
+          .admin-main { margin-left: 240px !important; padding: 2rem !important; }
+          .admin-stats { grid-template-columns: repeat(2, 1fr) !important; }
+          .quote-row { grid-template-columns: 1fr 1fr !important; gap: 1.5rem !important; }
+          .quote-border { border-left: none !important; padding-left: 0 !important; }
+          .quote-actions { align-items: flex-start !important; flex-direction: row-reverse !important; justify-content: flex-end !important; }
+        }
+        @media (max-width: 768px) {
+          .admin-layout { flex-direction: column !important; }
+          
+          /* Mobile Sidebar / Header */
+          .admin-sidebar {
+            width: 100% !important;
+            height: auto !important;
+            position: relative !important;
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            padding: 1rem 1.5rem !important;
+            border-right: none !important;
+            border-bottom: 1px solid #1F1F1F !important;
+            z-index: 50 !important;
+          }
+          .sidebar-header { padding: 0 !important; }
+          .sidebar-subtitle { display: none !important; }
+          .sidebar-nav { display: none !important; }
+          .sidebar-footer { padding: 0 !important; display: flex !important; gap: 1rem !important; }
+          .user-info { display: none !important; }
+          .logout-btn { padding: 0.5rem 1rem !important; width: auto !important; background-color: #1a1a1a !important; }
+          .logout-text { display: none !important; }
+          
+          /* Mobile Main Content */
+          .admin-main { margin-left: 0 !important; padding: 1.5rem 1rem !important; width: 100% !important; box-sizing: border-box !important; overflow-x: hidden !important; }
+          .admin-header { flex-direction: column !important; align-items: flex-start !important; gap: 1.5rem !important; margin-bottom: 2rem !important; }
+          .admin-filters { flex-wrap: wrap !important; width: 100% !important; }
+          .admin-filters button { flex: 1 1 calc(50% - 0.5rem) !important; text-align: center !important; }
+          
+          /* Mobile Stats */
+          .admin-stats { grid-template-columns: 1fr !important; gap: 1rem !important; margin-bottom: 2rem !important; }
+          
+          /* Mobile Quotes Grid */
+          .quote-row { grid-template-columns: 1fr !important; gap: 1rem !important; padding: 1.5rem !important; }
+          .quote-col { border-top: 1px solid #1F1F1F !important; padding-top: 1rem !important; }
+          .quote-col:first-child { border-top: none !important; padding-top: 0 !important; }
+          .quote-actions { 
+            border-top: 1px solid #1F1F1F !important; 
+            padding-top: 1rem !important; 
+            justify-content: space-between !important; 
+            flex-direction: row !important; 
+            align-items: center !important; 
+          }
+        }
+      `}</style>
     </div>
   );
 }
