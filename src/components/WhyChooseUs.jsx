@@ -44,7 +44,7 @@ export default function WhyChooseUs() {
             style={{ position: 'relative' }}
           >
             <img 
-              src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?q=80&w=2069&auto=format&fit=crop" 
+              src="/why-us.jpg" 
               alt="Decoration setup" 
               style={{ width: '100%', height: '600px', objectFit: 'cover', borderRadius: '4px' }}
             />

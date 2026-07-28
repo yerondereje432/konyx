@@ -1,10 +1,10 @@
 import { motion } from 'framer-motion';
 
 const portfolio = [
-  { id: 1, title: 'The Grand Botanica', category: 'Wedding', img: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=2069&auto=format&fit=crop' },
-  { id: 2, title: 'Tech Gala 2024', category: 'Corporate', img: 'https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=2069&auto=format&fit=crop' },
-  { id: 3, title: 'Golden Jubilee', category: 'Birthday', img: 'https://images.unsplash.com/photo-1533174000255-a681816e1564?q=80&w=2070&auto=format&fit=crop' },
-  { id: 4, title: 'Minimalist Romance', category: 'Wedding', img: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=2070&auto=format&fit=crop' }
+  { id: 1, title: 'The Grand Botanica', category: 'Wedding', img: '/gallery-1.jpg' },
+  { id: 2, title: 'Tech Gala 2024', category: 'Corporate', img: '/gallery-2.jpg' },
+  { id: 3, title: 'Golden Jubilee', category: 'Birthday', img: '/gallery-3.jpg' },
+  { id: 4, title: 'Minimalist Romance', category: 'Wedding', img: '/gallery-4.jpg' }
 ];
 
 export default function Gallery() {

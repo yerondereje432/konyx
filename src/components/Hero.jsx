@@ -11,15 +11,23 @@ export default function Hero() {
       justifyContent: 'center',
       overflow: 'hidden'
     }}>
-      {/* Background Image */}
-      <div style={{
-        position: 'absolute',
-        top: 0, left: 0, width: '100%', height: '100%',
-        backgroundImage: 'url("https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2069&auto=format&fit=crop")',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        zIndex: -2
-      }} />
+      {/* Background Video (Requires hero-bg.mp4 in public folder) */}
+      <video 
+        autoPlay 
+        loop 
+        muted 
+        playsInline
+        poster="/hero-bg.jpg"
+        style={{
+          position: 'absolute',
+          top: 0, left: 0, width: '100%', height: '100%',
+          objectFit: 'cover',
+          zIndex: -2,
+          backgroundColor: '#1a1a1a'
+        }}
+      >
+        <source src="/hero-bg.mp4" type="video/mp4" />
+      </video>
       
       {/* Dark Overlay */}
       <div style={{

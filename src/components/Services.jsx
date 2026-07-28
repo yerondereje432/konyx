@@ -4,17 +4,17 @@ const services = [
   {
     title: 'Wedding Decoration',
     desc: 'Bespoke floral arrangements, stage design, and lighting to make your special day unforgettable.',
-    img: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?q=80&w=2070&auto=format&fit=crop'
+    img: '/service-1.jpg'
   },
   {
     title: 'Corporate Events',
     desc: 'Professional styling for galas, product launches, and company milestones that reflect your brand.',
-    img: 'https://images.unsplash.com/photo-1505366581177-033100235b2e?q=80&w=2070&auto=format&fit=crop'
+    img: '/service-2.jpg'
   },
   {
     title: 'Birthday & Social',
     desc: 'Themed decor, balloon installations, and custom backdrops for intimate and grand celebrations.',
-    img: 'https://images.unsplash.com/photo-1530103862676-de88b6b0853a?q=80&w=2070&auto=format&fit=crop'
+    img: '/service-3.jpg'
   }
 ];
 
