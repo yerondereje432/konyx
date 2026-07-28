@@ -278,7 +278,7 @@ export default function Dashboard({ session }) {
             </header>
 
             {/* UPLOAD FORM */}
-            <form onSubmit={handleUploadGallery} style={{ backgroundColor: '#111', padding: '2rem', borderRadius: '12px', border: '1px dashed #333', display: 'flex', gap: '1rem', alignItems: 'flex-end', marginBottom: '3rem', flexWrap: 'wrap' }}>
+            <form className="cms-form" onSubmit={handleUploadGallery} style={{ backgroundColor: '#111', padding: '2rem', borderRadius: '12px', border: '1px dashed #333', display: 'flex', gap: '1rem', alignItems: 'flex-end', marginBottom: '3rem', flexWrap: 'wrap' }}>
               <div style={{ flex: 1, minWidth: '200px' }}>
                 <label style={{ display: 'block', fontSize: '0.8rem', color: '#888', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Project Title</label>
                 <input type="text" value={newImage.title} onChange={e=>setNewImage({...newImage, title: e.target.value})} required style={{ width: '100%', padding: '0.8rem', backgroundColor: '#0A0A0A', border: '1px solid #333', color: '#FFF', borderRadius: '6px' }} placeholder="e.g. The Grand Botanica" />
@@ -328,19 +328,89 @@ export default function Dashboard({ session }) {
         @media (max-width: 1024px) {
           .admin-sidebar { width: 240px !important; }
           .admin-main { margin-left: 240px !important; padding: 2rem !important; }
+          .admin-stats { grid-template-columns: repeat(2, 1fr) !important; }
         }
         @media (max-width: 768px) {
           .admin-layout { flex-direction: column !important; }
-          .admin-sidebar { width: 100% !important; height: auto !important; position: relative !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; padding: 1rem !important; border-right: none !important; border-bottom: 1px solid #1F1F1F !important; }
-          .sidebar-header { padding: 0 !important; }
+          
+          /* Mobile Sidebar */
+          .admin-sidebar { 
+            width: 100% !important; 
+            height: auto !important; 
+            position: relative !important; 
+            flex-direction: column !important; 
+            padding: 0 !important; 
+            border-right: none !important; 
+            border-bottom: 1px solid #1F1F1F !important; 
+          }
+          
+          .sidebar-header { 
+            padding: 1.5rem !important; 
+            display: flex !important; 
+            justify-content: space-between !important; 
+            align-items: center !important; 
+          }
           .sidebar-subtitle { display: none !important; }
-          .sidebar-nav { display: flex !important; flex-direction: row !important; padding: 0 !important; justify-content: center !important; }
-          .sidebar-nav button { padding: 0.5rem !important; font-size: 0.8rem !important; }
+          
+          .sidebar-nav { 
+            display: flex !important; 
+            flex-direction: row !important; 
+            padding: 0 1.5rem 1.5rem 1.5rem !important; 
+            gap: 1rem !important; 
+          }
+          .sidebar-nav button { 
+            padding: 0.75rem !important; 
+            font-size: 0.85rem !important; 
+            justify-content: center !important; 
+          }
           .sidebar-footer { display: none !important; }
-          .admin-main { margin-left: 0 !important; padding: 1.5rem 1rem !important; width: 100% !important; box-sizing: border-box !important; }
-          .quote-row { grid-template-columns: 1fr !important; gap: 1rem !important; padding: 1.5rem !important; }
-          .quote-border { border-left: none !important; padding-left: 0 !important; border-top: 1px solid #1F1F1F !important; padding-top: 1rem !important; }
-          .quote-actions { flex-direction: row !important; justify-content: space-between !important; border-top: 1px solid #1F1F1F !important; padding-top: 1rem !important; }
+          
+          /* Mobile Main Content */
+          .admin-main { 
+            margin-left: 0 !important; 
+            padding: 1.5rem !important; 
+            width: 100% !important; 
+            box-sizing: border-box !important; 
+          }
+          
+          .admin-header { 
+            flex-direction: column !important; 
+            align-items: flex-start !important; 
+            gap: 1rem !important; 
+            margin-bottom: 2rem !important; 
+          }
+          
+          .admin-stats { 
+            grid-template-columns: 1fr !important; 
+            gap: 1rem !important; 
+            margin-bottom: 2rem !important; 
+          }
+          
+          /* Mobile Quote Rows */
+          .quote-row { 
+            grid-template-columns: 1fr !important; 
+            gap: 1rem !important; 
+            padding: 1.5rem !important; 
+          }
+          .quote-border { 
+            border-left: none !important; 
+            padding-left: 0 !important; 
+            border-top: 1px solid #1F1F1F !important; 
+            padding-top: 1rem !important; 
+          }
+          .quote-actions { 
+            flex-direction: row !important; 
+            justify-content: space-between !important; 
+            border-top: 1px solid #1F1F1F !important; 
+            padding-top: 1rem !important; 
+            align-items: center !important;
+          }
+          
+          /* Mobile Portfolio CMS */
+          .cms-form {
+            flex-direction: column !important;
+            align-items: stretch !important;
+          }
         }
       `}</style>
     </div>
