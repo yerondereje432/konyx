@@ -1,66 +1,131 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { LogOut, Trash2, LayoutDashboard, Mail, Phone, Calendar, MapPin, DollarSign, Package, Sparkles, Inbox, TrendingUp, User } from 'lucide-react';
+import { LogOut, LayoutDashboard, Mail, Phone, Calendar, MapPin, DollarSign, Package, Sparkles, Inbox, TrendingUp, User, Image as ImageIcon, Archive, UploadCloud, Trash2, CheckCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Dashboard({ session }) {
+  const [activeTab, setActiveTab] = useState('quotes'); // 'quotes' or 'portfolio'
+  
+  // Quotes State
   const [quotes, setQuotes] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingQuotes, setLoadingQuotes] = useState(true);
   const [filter, setFilter] = useState('All');
+  const [showArchived, setShowArchived] = useState(false);
+
+  // Gallery State
+  const [gallery, setGallery] = useState([]);
+  const [loadingGallery, setLoadingGallery] = useState(true);
+  const [uploading, setUploading] = useState(false);
+  const [newImage, setNewImage] = useState({ title: '', category: 'Wedding', file: null });
 
   useEffect(() => {
     fetchQuotes();
+    fetchGallery();
   }, []);
 
+  // --- QUOTES (CRM) LOGIC ---
   const fetchQuotes = async () => {
     try {
-      const { data, error } = await supabase
-        .from('quotes')
-        .select('*')
-        .order('created_at', { ascending: false });
-        
+      const { data, error } = await supabase.from('quotes').select('*').order('created_at', { ascending: false });
       if (error) throw error;
       setQuotes(data || []);
     } catch (error) {
       console.error('Error fetching quotes:', error.message);
     } finally {
-      setLoading(false);
+      setLoadingQuotes(false);
     }
   };
 
-  const deleteQuote = async (id) => {
-    if (!window.confirm('Are you sure you want to permanently delete this inquiry?')) return;
-    
+  const updateQuoteStatus = async (id, newStatus) => {
     try {
-      const { error } = await supabase.from('quotes').delete().eq('id', id);
+      const { error } = await supabase.from('quotes').update({ status: newStatus }).eq('id', id);
       if (error) throw error;
-      setQuotes(quotes.filter(q => q.id !== id));
+      setQuotes(quotes.map(q => q.id === id ? { ...q, status: newStatus } : q));
     } catch (error) {
-      console.error('Error deleting quote:', error.message);
+      console.error('Error updating status:', error.message);
     }
   };
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
+  const toggleArchive = async (id, currentArchived) => {
+    try {
+      const { error } = await supabase.from('quotes').update({ archived: !currentArchived }).eq('id', id);
+      if (error) throw error;
+      setQuotes(quotes.map(q => q.id === id ? { ...q, archived: !currentArchived } : q));
+    } catch (error) {
+      console.error('Error archiving:', error.message);
+    }
   };
 
-  // Stats calculation
-  const totalQuotes = quotes.length;
-  const thisWeek = quotes.filter(q => new Date(q.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).length;
-  const highValue = quotes.filter(q => q.budget?.includes('300,000+') || q.budget?.includes('150,000')).length;
-
-  const filteredQuotes = filter === 'All' ? quotes : quotes.filter(q => q.event_type?.toLowerCase().includes(filter.toLowerCase()));
-
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    show: { opacity: 1, transition: { staggerChildren: 0.1 } }
+  // --- GALLERY (CMS) LOGIC ---
+  const fetchGallery = async () => {
+    try {
+      const { data, error } = await supabase.from('gallery').select('*').order('created_at', { ascending: false });
+      if (error) throw error;
+      setGallery(data || []);
+    } catch (error) {
+      console.error('Error fetching gallery:', error.message);
+    } finally {
+      setLoadingGallery(false);
+    }
   };
+
+  const handleUploadGallery = async (e) => {
+    e.preventDefault();
+    if (!newImage.file || !newImage.title) return alert('Please provide a title and image.');
+    setUploading(true);
+
+    try {
+      // 1. Upload image to Supabase Storage Bucket 'portfolio'
+      const fileExt = newImage.file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage.from('portfolio').upload(filePath, newImage.file);
+      if (uploadError) throw uploadError;
+
+      // 2. Get public URL
+      const { data: { publicUrl } } = supabase.storage.from('portfolio').getPublicUrl(filePath);
+
+      // 3. Save to database
+      const { data: dbData, error: dbError } = await supabase.from('gallery').insert([
+        { title: newImage.title, category: newImage.category, img: publicUrl }
+      ]).select();
+      
+      if (dbError) throw dbError;
+
+      setGallery([dbData[0], ...gallery]);
+      setNewImage({ title: '', category: 'Wedding', file: null });
+      alert("Image uploaded successfully!");
+    } catch (error) {
+      console.error('Error uploading:', error.message);
+      alert('Upload failed: ' + error.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const deleteGalleryItem = async (id) => {
+    if (!window.confirm("Delete this image from your portfolio?")) return;
+    try {
+      const { error } = await supabase.from('gallery').delete().eq('id', id);
+      if (error) throw error;
+      setGallery(gallery.filter(g => g.id !== id));
+    } catch (error) {
+      console.error('Error deleting:', error.message);
+    }
+  };
+
+  // --- CALCULATIONS ---
+  const activeQuotes = quotes.filter(q => showArchived ? q.archived : !q.archived);
+  const filteredQuotes = filter === 'All' ? activeQuotes : activeQuotes.filter(q => q.event_type?.toLowerCase().includes(filter.toLowerCase()));
   
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
-  };
+  // Pipeline Revenue Forecasting (Extracts numbers from budget strings safely)
+  const pipelineValue = quotes.filter(q => !q.archived).reduce((acc, q) => {
+    if (q.budget?.includes('300,000')) return acc + 300000;
+    if (q.budget?.includes('150,000')) return acc + 150000;
+    if (q.budget?.includes('50,000')) return acc + 50000;
+    return acc;
+  }, 0);
 
   return (
     <div className="admin-layout" style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#0A0A0A', color: '#E5E7EB', fontFamily: 'var(--font-body)' }}>
@@ -74,23 +139,24 @@ export default function Dashboard({ session }) {
           <p className="sidebar-subtitle" style={{ color: '#666', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '1px', marginTop: '0.5rem', margin: 0 }}>VIP Dashboard</p>
         </div>
 
-        <nav className="sidebar-nav" style={{ flex: 1, padding: '0 1rem' }}>
-          <button style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', backgroundColor: '#1A1A1A', color: 'var(--color-accent)', border: '1px solid #2A2A2A', borderRadius: '8px', cursor: 'pointer', fontSize: '0.95rem', fontWeight: 600 }}>
-            <LayoutDashboard size={18} /> Inquiries
+        <nav className="sidebar-nav" style={{ flex: 1, padding: '0 1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <button 
+            onClick={() => setActiveTab('quotes')}
+            style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', backgroundColor: activeTab === 'quotes' ? '#1A1A1A' : 'transparent', color: activeTab === 'quotes' ? 'var(--color-accent)' : '#888', border: activeTab === 'quotes' ? '1px solid #2A2A2A' : '1px solid transparent', borderRadius: '8px', cursor: 'pointer', fontSize: '0.95rem', fontWeight: 600, transition: 'all 0.3s' }}
+          >
+            <LayoutDashboard size={18} /> CRM Leads
+          </button>
+          
+          <button 
+            onClick={() => setActiveTab('portfolio')}
+            style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem', backgroundColor: activeTab === 'portfolio' ? '#1A1A1A' : 'transparent', color: activeTab === 'portfolio' ? 'var(--color-accent)' : '#888', border: activeTab === 'portfolio' ? '1px solid #2A2A2A' : '1px solid transparent', borderRadius: '8px', cursor: 'pointer', fontSize: '0.95rem', fontWeight: 600, transition: 'all 0.3s' }}
+          >
+            <ImageIcon size={18} /> Portfolio CMS
           </button>
         </nav>
 
         <div className="sidebar-footer" style={{ padding: '2rem' }}>
-          <div className="user-info" style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem', padding: '1rem', backgroundColor: '#1A1A1A', borderRadius: '8px' }}>
-            <div style={{ width: '35px', height: '35px', borderRadius: '50%', backgroundColor: 'var(--color-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', flexShrink: 0 }}>
-              <User size={18} />
-            </div>
-            <div style={{ overflow: 'hidden' }}>
-              <p style={{ margin: 0, fontSize: '0.85rem', fontWeight: 600, color: '#fff' }}>Admin</p>
-              <p style={{ margin: 0, fontSize: '0.75rem', color: '#666', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{session?.user?.email}</p>
-            </div>
-          </div>
-          <button onClick={handleSignOut} className="logout-btn" style={{ width: '100%', padding: '0.75rem', backgroundColor: 'transparent', border: '1px solid #333', color: '#888', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', transition: 'all 0.3s' }} onMouseOver={(e) => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = '#555'; }} onMouseOut={(e) => { e.currentTarget.style.color = '#888'; e.currentTarget.style.borderColor = '#333'; }}>
+          <button onClick={() => supabase.auth.signOut()} className="logout-btn" style={{ width: '100%', padding: '0.75rem', backgroundColor: 'transparent', border: '1px solid #333', color: '#888', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', transition: 'all 0.3s' }} onMouseOver={(e) => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = '#555'; }} onMouseOut={(e) => { e.currentTarget.style.color = '#888'; e.currentTarget.style.borderColor = '#333'; }}>
             <LogOut size={16} /> <span className="logout-text">Secure Logout</span>
           </button>
         </div>
@@ -99,205 +165,182 @@ export default function Dashboard({ session }) {
       {/* Main Content */}
       <main className="admin-main" style={{ marginLeft: '280px', flex: 1, padding: '3rem 4rem', position: 'relative', width: '100%' }}>
         
-        {/* Header Area */}
-        <header className="admin-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '3rem' }}>
-          <div>
-            <motion.h2 initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} style={{ fontFamily: 'var(--font-heading)', fontSize: '2.5rem', color: '#FFF', margin: '0 0 0.5rem 0' }}>Overview</motion.h2>
-            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} style={{ color: '#888', margin: 0 }}>Review and manage your incoming event styling requests.</motion.p>
-          </div>
-          
-          {/* Quick Filters */}
-          <motion.div className="admin-filters" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ display: 'flex', gap: '0.5rem', backgroundColor: '#111', padding: '0.5rem', borderRadius: '8px', border: '1px solid #222' }}>
-            {['All', 'Wedding', 'Corporate', 'Birthday'].map(f => (
-              <button 
-                key={f} 
-                onClick={() => setFilter(f)}
-                style={{ padding: '0.5rem 1rem', borderRadius: '4px', border: 'none', backgroundColor: filter === f ? 'var(--color-accent)' : 'transparent', color: filter === f ? '#fff' : '#888', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600, transition: 'all 0.3s' }}
-              >
-                {f}
-              </button>
-            ))}
-          </motion.div>
-        </header>
-
-        {/* Stats Row */}
-        <motion.div className="admin-stats" variants={containerVariants} initial="hidden" animate="show" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem', marginBottom: '3rem' }}>
-          {[
-            { title: 'Total Inquiries', value: totalQuotes, icon: <Inbox size={24} color="var(--color-accent)" />, spark: '+12% this month' },
-            { title: 'New This Week', value: thisWeek, icon: <TrendingUp size={24} color="#10B981" />, spark: 'Hot streak' },
-            { title: 'High-Value Leads', value: highValue, icon: <Sparkles size={24} color="#F59E0B" />, spark: '150k+ ETB budget' }
-          ].map((stat, idx) => (
-            <motion.div key={idx} variants={itemVariants} style={{ backgroundColor: '#111', border: '1px solid #1F1F1F', borderRadius: '12px', padding: '1.5rem', position: 'relative', overflow: 'hidden' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-                <h3 style={{ fontSize: '0.9rem', color: '#888', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '1px', margin: 0 }}>{stat.title}</h3>
-                <div style={{ backgroundColor: '#1A1A1A', padding: '0.5rem', borderRadius: '8px' }}>{stat.icon}</div>
+        {/* ===================== QUOTES CRM TAB ===================== */}
+        {activeTab === 'quotes' && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <header className="admin-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '3rem' }}>
+              <div>
+                <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.5rem', color: '#FFF', margin: '0 0 0.5rem 0' }}>Pipeline Overview</h2>
+                <p style={{ color: '#888', margin: 0 }}>Review, update statuses, and manage your incoming styling requests.</p>
               </div>
-              <div style={{ fontSize: '2.5rem', fontFamily: 'var(--font-heading)', color: '#FFF', lineHeight: 1, marginBottom: '0.5rem' }}>{stat.value}</div>
-              <p style={{ fontSize: '0.8rem', color: '#555', margin: 0 }}>{stat.spark}</p>
-              <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '2px', background: 'linear-gradient(90deg, var(--color-accent) 0%, transparent 100%)', opacity: 0.5 }} />
-            </motion.div>
-          ))}
-        </motion.div>
-
-        {/* Quotes List */}
-        <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h3 style={{ fontSize: '1.2rem', color: '#FFF', fontFamily: 'var(--font-heading)', margin: 0 }}>Recent Requests</h3>
-          <span style={{ fontSize: '0.85rem', color: '#666' }}>Showing {filteredQuotes.length} results</span>
-        </div>
-
-        {loading ? (
-          <div style={{ padding: '3rem', textAlign: 'center', color: '#666' }}>Loading elite requests...</div>
-        ) : filteredQuotes.length === 0 ? (
-          <div style={{ backgroundColor: '#111', border: '1px dashed #222', padding: '4rem', textAlign: 'center', borderRadius: '12px', color: '#666' }}>
-            <Inbox size={48} style={{ margin: '0 auto 1rem auto', opacity: 0.2 }} />
-            <p style={{ margin: 0 }}>No inquiries found for this category.</p>
-          </div>
-        ) : (
-          <motion.div variants={containerVariants} initial="hidden" animate="show" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            <AnimatePresence>
-              {filteredQuotes.map(quote => (
-                <motion.div 
-                  key={quote.id} 
-                  variants={itemVariants}
-                  exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
-                  className="quote-row"
-                  style={{ backgroundColor: '#111', border: '1px solid #1F1F1F', borderRadius: '12px', padding: '2rem', display: 'grid', gridTemplateColumns: '2fr 1.5fr 1.5fr auto', gap: '2rem', alignItems: 'center', transition: 'border-color 0.3s', position: 'relative' }}
-                  onMouseOver={(e) => e.currentTarget.style.borderColor = '#333'}
-                  onMouseOut={(e) => e.currentTarget.style.borderColor = '#1F1F1F'}
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                <button 
+                  onClick={() => setShowArchived(!showArchived)}
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1rem', borderRadius: '8px', border: '1px solid #333', backgroundColor: showArchived ? '#1A1A1A' : 'transparent', color: showArchived ? 'var(--color-accent)' : '#888', cursor: 'pointer', fontSize: '0.85rem' }}
                 >
-                  
-                  {/* Column 1: Client Info */}
-                  <div className="quote-col">
-                    <div style={{ display: 'inline-block', backgroundColor: 'rgba(197, 168, 128, 0.1)', color: 'var(--color-accent)', padding: '0.25rem 0.75rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '1rem' }}>
-                      {quote.event_type}
-                    </div>
-                    <h3 style={{ fontSize: '1.3rem', color: '#FFF', margin: '0 0 0.5rem 0', fontFamily: 'var(--font-heading)' }}>{quote.name}</h3>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                      <a href={`mailto:${quote.email}`} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#888', fontSize: '0.85rem', textDecoration: 'none' }}><Mail size={14} /> {quote.email}</a>
-                      <a href={`tel:${quote.phone}`} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#888', fontSize: '0.85rem', textDecoration: 'none' }}><Phone size={14} /> {quote.phone}</a>
-                    </div>
-                  </div>
+                  <Archive size={16} /> {showArchived ? 'View Active Leads' : 'View Archived'}
+                </button>
+              </div>
+            </header>
 
-                  {/* Column 2: Event Details */}
-                  <div className="quote-col quote-border" style={{ borderLeft: '1px solid #222', paddingLeft: '2rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', marginBottom: '1rem' }}>
-                      <Calendar size={18} color="#666" style={{ marginTop: '2px' }} />
-                      <div>
-                        <p style={{ margin: 0, fontSize: '0.75rem', color: '#666', textTransform: 'uppercase' }}>Event Date</p>
-                        <p style={{ margin: 0, color: '#E5E7EB', fontWeight: 500 }}>{quote.event_date ? new Date(quote.event_date).toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' }) : 'TBD'}</p>
+            {!showArchived && (
+              <div className="admin-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem', marginBottom: '3rem' }}>
+                {[
+                  { title: 'Active Inquiries', value: quotes.filter(q=>!q.archived).length, icon: <Inbox size={24} color="var(--color-accent)" />, spark: 'To be processed' },
+                  { title: 'Est. Pipeline Revenue', value: `${(pipelineValue / 1000)}k+`, icon: <DollarSign size={24} color="#10B981" />, spark: 'Total projected value (ETB)' },
+                  { title: 'Booked Events', value: quotes.filter(q=>q.status==='Booked').length, icon: <CheckCircle size={24} color="#3B82F6" />, spark: 'Successfully closed' }
+                ].map((stat, idx) => (
+                  <div key={idx} style={{ backgroundColor: '#111', border: '1px solid #1F1F1F', borderRadius: '12px', padding: '1.5rem', position: 'relative', overflow: 'hidden' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                      <h3 style={{ fontSize: '0.9rem', color: '#888', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '1px', margin: 0 }}>{stat.title}</h3>
+                      <div style={{ backgroundColor: '#1A1A1A', padding: '0.5rem', borderRadius: '8px' }}>{stat.icon}</div>
+                    </div>
+                    <div style={{ fontSize: '2.5rem', fontFamily: 'var(--font-heading)', color: '#FFF', lineHeight: 1, marginBottom: '0.5rem' }}>{stat.value}</div>
+                    <p style={{ fontSize: '0.8rem', color: '#555', margin: 0 }}>{stat.spark}</p>
+                    <div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '2px', background: 'linear-gradient(90deg, var(--color-accent) 0%, transparent 100%)', opacity: 0.5 }} />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <AnimatePresence>
+                {filteredQuotes.map(quote => (
+                  <motion.div 
+                    key={quote.id} 
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    className="quote-row"
+                    style={{ backgroundColor: '#111', border: '1px solid #1F1F1F', borderRadius: '12px', padding: '2rem', display: 'grid', gridTemplateColumns: '2fr 1.5fr 1.5fr auto', gap: '2rem', alignItems: 'center', position: 'relative' }}
+                  >
+                    
+                    <div className="quote-col">
+                      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+                        <span style={{ backgroundColor: 'rgba(197, 168, 128, 0.1)', color: 'var(--color-accent)', padding: '0.25rem 0.75rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase' }}>{quote.event_type}</span>
+                        {quote.status === 'Booked' && <span style={{ backgroundColor: 'rgba(59, 130, 246, 0.1)', color: '#3B82F6', padding: '0.25rem 0.75rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase' }}>Booked 🎉</span>}
+                      </div>
+                      <h3 style={{ fontSize: '1.3rem', color: '#FFF', margin: '0 0 0.5rem 0', fontFamily: 'var(--font-heading)' }}>{quote.name}</h3>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                        <a href={`mailto:${quote.email}`} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#888', fontSize: '0.85rem', textDecoration: 'none' }}><Mail size={14} /> {quote.email}</a>
+                        <a href={`tel:${quote.phone}`} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#888', fontSize: '0.85rem', textDecoration: 'none' }}><Phone size={14} /> {quote.phone}</a>
                       </div>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
-                      <MapPin size={18} color="#666" style={{ marginTop: '2px' }} />
-                      <div>
-                        <p style={{ margin: 0, fontSize: '0.75rem', color: '#666', textTransform: 'uppercase' }}>Location & Guests</p>
-                        <p style={{ margin: 0, color: '#E5E7EB', fontWeight: 500 }}>{quote.location || 'TBD'} • {quote.guests ? `${quote.guests} ppl` : 'N/A'}</p>
-                      </div>
-                    </div>
-                  </div>
 
-                  {/* Column 3: Package & Budget */}
-                  <div className="quote-col quote-border" style={{ borderLeft: '1px solid #222', paddingLeft: '2rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', marginBottom: '1rem' }}>
-                      <Package size={18} color="#666" style={{ marginTop: '2px' }} />
-                      <div>
-                        <p style={{ margin: 0, fontSize: '0.75rem', color: '#666', textTransform: 'uppercase' }}>Selected Package</p>
-                        <p style={{ margin: 0, color: 'var(--color-accent)', fontWeight: 600 }}>{quote.package || 'Undecided'}</p>
-                      </div>
+                    <div className="quote-col quote-border" style={{ borderLeft: '1px solid #222', paddingLeft: '2rem' }}>
+                      <p style={{ margin: '0 0 0.5rem', fontSize: '0.75rem', color: '#666', textTransform: 'uppercase' }}>Event Details</p>
+                      <p style={{ margin: '0 0 0.25rem', color: '#E5E7EB', fontSize: '0.9rem' }}><strong>Date:</strong> {quote.event_date ? new Date(quote.event_date).toLocaleDateString() : 'TBD'}</p>
+                      <p style={{ margin: '0 0 0.25rem', color: '#E5E7EB', fontSize: '0.9rem' }}><strong>Venue:</strong> {quote.location || 'TBD'}</p>
+                      <p style={{ margin: 0, color: '#E5E7EB', fontSize: '0.9rem' }}><strong>Guests:</strong> {quote.guests || 'N/A'}</p>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
-                      <DollarSign size={18} color="#666" style={{ marginTop: '2px' }} />
-                      <div>
-                        <p style={{ margin: 0, fontSize: '0.75rem', color: '#666', textTransform: 'uppercase' }}>Est. Budget</p>
-                        <p style={{ margin: 0, color: '#10B981', fontWeight: 500 }}>{quote.budget || 'Undisclosed'}</p>
-                      </div>
-                    </div>
-                  </div>
 
-                  {/* Column 4: Actions */}
-                  <div className="quote-actions" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '1rem' }}>
-                    <span style={{ fontSize: '0.7rem', color: '#555' }}>{new Date(quote.created_at).toLocaleDateString()}</span>
-                    <button 
-                      onClick={() => deleteQuote(quote.id)}
-                      style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '0.75rem', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.3s' }}
-                      onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#ef4444'; e.currentTarget.style.color = '#fff'; }}
-                      onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.1)'; e.currentTarget.style.color = '#ef4444'; }}
-                      title="Discard Inquiry"
-                    >
-                      <Trash2 size={18} />
-                    </button>
-                  </div>
-
-                  {/* Optional Message Dropdown Area */}
-                  {quote.message && (
-                    <div style={{ gridColumn: '1 / -1', marginTop: '1rem', paddingTop: '1.5rem', borderTop: '1px dashed #222' }}>
-                      <p style={{ margin: 0, fontSize: '0.85rem', color: '#888', lineHeight: 1.6 }}>
-                        <strong style={{ color: '#ccc' }}>Client's Vision:</strong> "{quote.message}"
-                      </p>
+                    <div className="quote-col quote-border" style={{ borderLeft: '1px solid #222', paddingLeft: '2rem' }}>
+                      <p style={{ margin: '0 0 0.5rem', fontSize: '0.75rem', color: '#666', textTransform: 'uppercase' }}>Lead Value</p>
+                      <p style={{ margin: '0 0 0.25rem', color: 'var(--color-accent)', fontWeight: 600 }}>{quote.package || 'Undecided'}</p>
+                      <p style={{ margin: 0, color: '#10B981', fontWeight: 500 }}>{quote.budget || 'Undisclosed'}</p>
                     </div>
-                  )}
-                  
-                </motion.div>
-              ))}
-            </AnimatePresence>
+
+                    <div className="quote-actions" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '1rem' }}>
+                      
+                      {/* STATUS DROPDOWN */}
+                      <select 
+                        value={quote.status || 'New'} 
+                        onChange={(e) => updateQuoteStatus(quote.id, e.target.value)}
+                        style={{ backgroundColor: '#1A1A1A', color: '#FFF', border: '1px solid #333', padding: '0.5rem', borderRadius: '6px', fontSize: '0.85rem', outline: 'none', cursor: 'pointer' }}
+                      >
+                        <option value="New">Status: New</option>
+                        <option value="Contacted">Status: Contacted</option>
+                        <option value="Proposal Sent">Status: Proposal Sent</option>
+                        <option value="Booked">Status: Booked</option>
+                        <option value="Lost">Status: Lost</option>
+                      </select>
+
+                      <button 
+                        onClick={() => toggleArchive(quote.id, quote.archived)}
+                        style={{ backgroundColor: 'transparent', color: '#888', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', transition: 'color 0.3s' }}
+                        onMouseOver={(e) => e.currentTarget.style.color = '#FFF'}
+                        onMouseOut={(e) => e.currentTarget.style.color = '#888'}
+                      >
+                        <Archive size={16} /> {quote.archived ? 'Unarchive' : 'Archive'}
+                      </button>
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
           </motion.div>
         )}
+
+        {/* ===================== PORTFOLIO CMS TAB ===================== */}
+        {activeTab === 'portfolio' && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <header className="admin-header" style={{ marginBottom: '3rem' }}>
+              <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.5rem', color: '#FFF', margin: '0 0 0.5rem 0' }}>Portfolio CMS</h2>
+              <p style={{ color: '#888', margin: 0 }}>Upload new images here. They will instantly appear on the public Gallery page.</p>
+            </header>
+
+            {/* UPLOAD FORM */}
+            <form onSubmit={handleUploadGallery} style={{ backgroundColor: '#111', padding: '2rem', borderRadius: '12px', border: '1px dashed #333', display: 'flex', gap: '1rem', alignItems: 'flex-end', marginBottom: '3rem', flexWrap: 'wrap' }}>
+              <div style={{ flex: 1, minWidth: '200px' }}>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: '#888', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Project Title</label>
+                <input type="text" value={newImage.title} onChange={e=>setNewImage({...newImage, title: e.target.value})} required style={{ width: '100%', padding: '0.8rem', backgroundColor: '#0A0A0A', border: '1px solid #333', color: '#FFF', borderRadius: '6px' }} placeholder="e.g. The Grand Botanica" />
+              </div>
+              <div style={{ flex: 1, minWidth: '150px' }}>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: '#888', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Category</label>
+                <select value={newImage.category} onChange={e=>setNewImage({...newImage, category: e.target.value})} style={{ width: '100%', padding: '0.8rem', backgroundColor: '#0A0A0A', border: '1px solid #333', color: '#FFF', borderRadius: '6px' }}>
+                  <option>Wedding</option>
+                  <option>Corporate</option>
+                  <option>Birthday</option>
+                </select>
+              </div>
+              <div style={{ flex: 1, minWidth: '200px' }}>
+                <label style={{ display: 'block', fontSize: '0.8rem', color: '#888', marginBottom: '0.5rem', textTransform: 'uppercase' }}>Image File</label>
+                <input type="file" accept="image/*" onChange={e=>setNewImage({...newImage, file: e.target.files[0]})} required style={{ width: '100%', padding: '0.7rem', backgroundColor: '#0A0A0A', border: '1px solid #333', color: '#FFF', borderRadius: '6px' }} />
+              </div>
+              <button type="submit" disabled={uploading} style={{ padding: '0.8rem 2rem', backgroundColor: 'var(--color-accent)', color: '#FFF', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', opacity: uploading ? 0.7 : 1 }}>
+                <UploadCloud size={18} /> {uploading ? 'Uploading...' : 'Publish'}
+              </button>
+            </form>
+
+            {/* LIVE GALLERY GRID */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1.5rem' }}>
+              {gallery.map(img => (
+                <div key={img.id} style={{ backgroundColor: '#111', borderRadius: '8px', overflow: 'hidden', border: '1px solid #222', position: 'relative', group: 'true' }}>
+                  <img src={img.img} alt={img.title} style={{ width: '100%', height: '200px', objectFit: 'cover' }} />
+                  <div style={{ padding: '1rem' }}>
+                    <p style={{ color: 'var(--color-accent)', fontSize: '0.7rem', textTransform: 'uppercase', marginBottom: '0.2rem' }}>{img.category}</p>
+                    <p style={{ color: '#FFF', margin: 0, fontWeight: 500, fontSize: '0.9rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{img.title}</p>
+                  </div>
+                  <button 
+                    onClick={() => deleteGalleryItem(img.id)}
+                    style={{ position: 'absolute', top: '0.5rem', right: '0.5rem', backgroundColor: 'rgba(0,0,0,0.7)', color: '#EF4444', border: 'none', padding: '0.5rem', borderRadius: '6px', cursor: 'pointer' }}
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              ))}
+              {gallery.length === 0 && !loadingGallery && <p style={{ color: '#666' }}>No images in the portfolio yet. Upload one above!</p>}
+            </div>
+          </motion.div>
+        )}
+
       </main>
       
       <style>{`
         @media (max-width: 1024px) {
           .admin-sidebar { width: 240px !important; }
           .admin-main { margin-left: 240px !important; padding: 2rem !important; }
-          .admin-stats { grid-template-columns: repeat(2, 1fr) !important; }
-          .quote-row { grid-template-columns: 1fr 1fr !important; gap: 1.5rem !important; }
-          .quote-border { border-left: none !important; padding-left: 0 !important; }
-          .quote-actions { align-items: flex-start !important; flex-direction: row-reverse !important; justify-content: flex-end !important; }
         }
         @media (max-width: 768px) {
           .admin-layout { flex-direction: column !important; }
-          
-          /* Mobile Sidebar / Header */
-          .admin-sidebar {
-            width: 100% !important;
-            height: auto !important;
-            position: relative !important;
-            display: flex !important;
-            flex-direction: row !important;
-            align-items: center !important;
-            justify-content: space-between !important;
-            padding: 1rem 1.5rem !important;
-            border-right: none !important;
-            border-bottom: 1px solid #1F1F1F !important;
-            z-index: 50 !important;
-          }
+          .admin-sidebar { width: 100% !important; height: auto !important; position: relative !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; padding: 1rem !important; border-right: none !important; border-bottom: 1px solid #1F1F1F !important; }
           .sidebar-header { padding: 0 !important; }
           .sidebar-subtitle { display: none !important; }
-          .sidebar-nav { display: none !important; }
-          .sidebar-footer { padding: 0 !important; display: flex !important; gap: 1rem !important; }
-          .user-info { display: none !important; }
-          .logout-btn { padding: 0.5rem 1rem !important; width: auto !important; background-color: #1a1a1a !important; }
-          .logout-text { display: none !important; }
-          
-          /* Mobile Main Content */
-          .admin-main { margin-left: 0 !important; padding: 1.5rem 1rem !important; width: 100% !important; box-sizing: border-box !important; overflow-x: hidden !important; }
-          .admin-header { flex-direction: column !important; align-items: flex-start !important; gap: 1.5rem !important; margin-bottom: 2rem !important; }
-          .admin-filters { flex-wrap: wrap !important; width: 100% !important; }
-          .admin-filters button { flex: 1 1 calc(50% - 0.5rem) !important; text-align: center !important; }
-          
-          /* Mobile Stats */
-          .admin-stats { grid-template-columns: 1fr !important; gap: 1rem !important; margin-bottom: 2rem !important; }
-          
-          /* Mobile Quotes Grid */
+          .sidebar-nav { display: flex !important; flex-direction: row !important; padding: 0 !important; justify-content: center !important; }
+          .sidebar-nav button { padding: 0.5rem !important; font-size: 0.8rem !important; }
+          .sidebar-footer { display: none !important; }
+          .admin-main { margin-left: 0 !important; padding: 1.5rem 1rem !important; width: 100% !important; box-sizing: border-box !important; }
           .quote-row { grid-template-columns: 1fr !important; gap: 1rem !important; padding: 1.5rem !important; }
-          .quote-col { border-top: 1px solid #1F1F1F !important; padding-top: 1rem !important; }
-          .quote-col:first-child { border-top: none !important; padding-top: 0 !important; }
-          .quote-actions { 
-            border-top: 1px solid #1F1F1F !important; 
-            padding-top: 1rem !important; 
-            justify-content: space-between !important; 
-            flex-direction: row !important; 
-            align-items: center !important; 
-          }
+          .quote-border { border-left: none !important; padding-left: 0 !important; border-top: 1px solid #1F1F1F !important; padding-top: 1rem !important; }
+          .quote-actions { flex-direction: row !important; justify-content: space-between !important; border-top: 1px solid #1F1F1F !important; padding-top: 1rem !important; }
         }
       `}</style>
     </div>
