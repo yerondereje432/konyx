@@ -20,7 +20,7 @@ export default function WhyChooseUs() {
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <span className="section-subtitle" style={{ textAlign: 'left' }}>The Aura Difference</span>
+            <span className="section-subtitle" style={{ textAlign: 'left' }}>Why Choose Us</span>
             <h2 className="heading-secondary" style={{ textAlign: 'left' }}>Crafting unforgettable atmospheres with precision.</h2>
             <p style={{ color: '#666', marginBottom: '2.5rem', fontSize: '1.05rem' }}>
               We believe that every celebration deserves to be beautiful and stress-free. Our dedicated team combines creative vision with meticulous planning to transform spaces into magical experiences.
