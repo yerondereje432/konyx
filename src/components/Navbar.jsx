@@ -37,15 +37,14 @@ const NavItem = ({ title, to, dropdownLinks, featured, isScrolled }) => {
               style={{ 
                 position: 'absolute', 
                 top: '100%', 
-                left: '50%',
-                transform: 'translateX(-50%)',
+                right: '-20%', // Align heavily to the right instead of center
                 paddingTop: '1rem', // Invisible bridge to keep hover active
                 zIndex: 100
               }}
             >
               <div style={{
                 backgroundColor: '#fff', 
-                width: '550px', 
+                width: '600px', 
                 boxShadow: '0 20px 40px rgba(0,0,0,0.08)', 
                 borderRadius: '12px', 
                 padding: '2rem',
@@ -54,7 +53,9 @@ const NavItem = ({ title, to, dropdownLinks, featured, isScrolled }) => {
                 gridTemplateColumns: '1fr 1fr',
                 gap: '2.5rem',
                 cursor: 'default',
-                textAlign: 'left'
+                textAlign: 'left',
+                position: 'relative',
+                transform: 'translateX(0)' // Reset any internal translation
               }}>
                 {/* Left: Link List */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
