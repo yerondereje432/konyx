@@ -10,7 +10,7 @@ export default function Footer() {
           
           <div style={{ gridColumn: 'span 1' }} className="footer-col">
             <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', marginBottom: '1rem' }}>
-              AURA<span style={{ color: 'var(--color-accent)' }}>DECOR</span>
+              MJ<span style={{ color: 'var(--color-accent)' }}>DECOR</span>
             </h3>
             <p style={{ color: '#ccc', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
               Decorating moments people remember. Premium event styling for weddings, corporate, and special occasions.
