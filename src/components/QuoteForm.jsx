@@ -22,6 +22,7 @@ export default function QuotePage() {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [fileNames, setFileNames] = useState([]);
+  const [telegramOpened, setTelegramOpened] = useState(false);
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files || []);
@@ -31,6 +32,13 @@ export default function QuotePage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+
+    // Reserve a blank tab RIGHT NOW, synchronously, while this handler still
+    // carries the user's click gesture. Browsers block window.open() calls
+    // made after an `await` — by the time the Supabase insert resolves, the
+    // gesture is gone and the redirect would get silently popup-blocked. We
+    // give this tab a real destination once we know the request was saved.
+    const telegramWindow = window.open('', '_blank');
 
     const formData = new FormData(e.target);
 
@@ -55,11 +63,55 @@ export default function QuotePage() {
 
       if (dbError) throw dbError;
 
-      // The lead is safely in Supabase at this point. Everything below is a
-      // best-effort notification — none of it should be able to make the
-      // user see a failure message for a submission that actually succeeded,
-      // so each one gets its own try/catch instead of sharing the outer one.
+      // The lead is safely in Supabase at this point. Everything below is
+      // best-effort — none of it should be able to make the user see a
+      // failure message for a submission that actually succeeded, so each
+      // step gets its own try/catch instead of sharing the outer one.
 
+      // Telegram click-to-chat redirect: the user is sent to Telegram with
+      // the request pre-filled, ready to send directly to the business
+      // owner. No bot token involved, so there's nothing secret to leak —
+      // a Telegram username isn't sensitive the way a bot token is.
+      const ownerTelegramUsername = import.meta.env.VITE_TELEGRAM_USERNAME;
+      if (ownerTelegramUsername) {
+        try {
+          const textMessage = `
+🎉 NEW VIP QUOTE REQUEST 🎉
+
+👤 Name: ${formData.get('Name')}
+📞 Phone: ${formData.get('Phone')}
+✉️ Email: ${formData.get('Email')}
+
+🎊 Event: ${formData.get('Event_Type') || 'Not specified'}
+📅 Date: ${formData.get('Event_Date') || 'TBD'}
+📍 Location: ${formData.get('Event_Location') || 'TBD'}
+👥 Guests: ${formData.get('Guest_Count') || 'TBD'}
+
+💎 Package: ${formData.get('Selected_Package') || 'Undecided'}
+💰 Budget: ${formData.get('Estimated_Budget') || 'Undisclosed'}
+
+📝 Message:
+${formData.get('Message') || 'No additional message.'}
+          `;
+
+          const telegramUrl = `https://t.me/${ownerTelegramUsername}?text=${encodeURIComponent(textMessage)}`;
+
+          if (telegramWindow) {
+            telegramWindow.location.href = telegramUrl;
+            setTelegramOpened(true);
+          } else {
+            // Reservation itself got blocked (e.g. browser setting, not
+            // gesture timing) — nothing more we can do client-side.
+            console.warn('Telegram redirect was blocked by the browser.');
+          }
+        } catch (err) {
+          console.error('Telegram redirect failed:', err);
+        }
+      } else if (telegramWindow) {
+        telegramWindow.close();
+      }
+
+      // Email notification via Web3Forms (fallback/record)
       const accessKey = import.meta.env.VITE_WEB3FORMS_KEY;
       if (accessKey && accessKey !== 'your_web3forms_key_here') {
         try {
@@ -76,57 +128,9 @@ export default function QuotePage() {
         }
       }
 
-      // Telegram instant notification. Escape Markdown special characters in
-      // user-supplied fields first — an unescaped _, *, [, ] or backtick in
-      // a name or message causes Telegram to reject the whole request with
-      // a 400, and it fails silently since this is best-effort.
-      const telegramBotToken = import.meta.env.VITE_TELEGRAM_BOT_TOKEN;
-      const telegramChatId = import.meta.env.VITE_TELEGRAM_CHAT_ID;
-      if (telegramBotToken && telegramChatId) {
-        try {
-          const escapeMd = (value) =>
-            String(value ?? '').replace(/([_*[\]()~`>#+\-=|{}.!\\])/g, '\\$1');
-
-          const textMessage = `
-🎉 *NEW VIP QUOTE REQUEST* 🎉
-👤 *Name:* ${escapeMd(formData.get('Name'))}
-📞 *Phone:* ${escapeMd(formData.get('Phone'))}
-✉️ *Email:* ${escapeMd(formData.get('Email'))}
-🎊 *Event:* ${escapeMd(formData.get('Event_Type'))}
-📅 *Date:* ${escapeMd(formData.get('Event_Date') || 'TBD')}
-📍 *Location:* ${escapeMd(formData.get('Event_Location') || 'TBD')}
-👥 *Guests:* ${escapeMd(formData.get('Guest_Count') || 'TBD')}
-💎 *Package:* ${escapeMd(formData.get('Selected_Package'))}
-💰 *Budget:* ${escapeMd(formData.get('Estimated_Budget'))}
-📝 *Message:*
-${escapeMd(formData.get('Message') || 'No additional message.')}
-👉 Check your Aura Admin Dashboard for more details!
-        `;
-
-          const tgResponse = await fetch(
-            `https://api.telegram.org/bot${telegramBotToken}/sendMessage`,
-            {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                chat_id: telegramChatId,
-                text: textMessage,
-                parse_mode: 'MarkdownV2',
-              }),
-            }
-          );
-
-          if (!tgResponse.ok) {
-            const body = await tgResponse.text();
-            console.error('Telegram notification failed:', tgResponse.status, body);
-          }
-        } catch (err) {
-          console.error('Telegram notification failed:', err);
-        }
-      }
-
       setSubmitted(true);
     } catch (error) {
+      if (telegramWindow) telegramWindow.close();
       console.error(error);
       alert('Something went wrong saving your request. Please try again.');
     } finally {
@@ -333,13 +337,25 @@ ${escapeMd(formData.get('Message') || 'No additional message.')}
                 </motion.div>
                 <span className="aq-eyebrow">Received</span>
                 <h3 className="aq-success-title">Thank you.</h3>
-                <p className="aq-aside-copy" style={{ margin: '0 auto 2rem', maxWidth: '30rem' }}>
+                <p className="aq-aside-copy" style={{ margin: '0 auto 1rem', maxWidth: '30rem' }}>
                   Your inquiry has been received. Our styling team will
                   review your details and get back to you within
                   24&ndash;48 hours.
                 </p>
+                {telegramOpened && (
+                  <p
+                    className="aq-aside-copy"
+                    style={{ margin: '0 auto 2rem', maxWidth: '30rem', color: 'var(--aq-gold)', fontSize: '0.9rem' }}
+                  >
+                    We&rsquo;ve also opened Telegram with your details pre-filled
+                    &mdash; just hit send there for the fastest response.
+                  </p>
+                )}
                 <button
-                  onClick={() => setSubmitted(false)}
+                  onClick={() => {
+                    setSubmitted(false);
+                    setTelegramOpened(false);
+                  }}
                   className="aq-ghost-btn"
                   type="button"
                 >
