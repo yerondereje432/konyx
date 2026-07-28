@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
 const services = [
   {
@@ -29,31 +30,32 @@ export default function Services() {
 
         <div className="grid grid-cols-3">
           {services.map((srv, idx) => (
-            <motion.div 
-              key={idx}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.6, delay: idx * 0.2 }}
-              style={{ group: 'true', cursor: 'pointer' }}
-              className="service-card"
-            >
-              <div style={{ overflow: 'hidden', marginBottom: '1.5rem', borderRadius: '4px' }}>
-                <img 
-                  src={srv.img} 
-                  alt={srv.title} 
-                  style={{ 
-                    width: '100%', 
-                    height: '350px', 
-                    objectFit: 'cover',
-                    transition: 'transform 0.6s ease'
-                  }} 
-                  className="service-img"
-                />
-              </div>
-              <h3 style={{ fontSize: '1.5rem', marginBottom: '0.75rem' }}>{srv.title}</h3>
-              <p style={{ color: '#666', fontSize: '0.95rem' }}>{srv.desc}</p>
-            </motion.div>
+            <Link to={`/quote?service=${encodeURIComponent(srv.title)}`} key={idx} style={{ textDecoration: 'none', color: 'inherit' }}>
+              <motion.div 
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.6, delay: idx * 0.2 }}
+                style={{ group: 'true', cursor: 'pointer' }}
+                className="service-card"
+              >
+                <div style={{ overflow: 'hidden', marginBottom: '1.5rem', borderRadius: '4px' }}>
+                  <img 
+                    src={srv.img} 
+                    alt={srv.title} 
+                    style={{ 
+                      width: '100%', 
+                      height: '350px', 
+                      objectFit: 'cover',
+                      transition: 'transform 0.6s ease'
+                    }} 
+                    className="service-img"
+                  />
+                </div>
+                <h3 style={{ fontSize: '1.5rem', marginBottom: '0.75rem' }}>{srv.title}</h3>
+                <p style={{ color: '#666', fontSize: '0.95rem' }}>{srv.desc}</p>
+              </motion.div>
+            </Link>
           ))}
         </div>
       </div>
