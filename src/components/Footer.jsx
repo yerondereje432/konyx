@@ -24,7 +24,7 @@ export default function Footer() {
               <div className="w-10 h-10 rounded-xl overflow-hidden bg-white flex items-center justify-center p-1 shadow-lg shadow-[#1D06F4]/30 border border-[#1D06F4]/40" style={{ width: 40, height: 40, minWidth: 40, minHeight: 40 }}>
                 <img src={konyxLogo} alt="Konyx Logo" className="w-full h-full object-contain" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
               </div>
-              <span className="font-bold text-2xl tracking-tight text-white flex items-center gap-1 font-['Syne']">
+              <span className="font-extrabold text-2xl tracking-tight text-white flex items-center gap-1 font-sans">
                 KONYX
                 <span className="w-2 h-2 rounded-full bg-[#00E5FF]"></span>
               </span>
@@ -48,7 +48,7 @@ export default function Footer() {
 
           {/* Col 2: Platform Links */}
           <div>
-            <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-4 font-['Syne']">
+            <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-4 font-sans">
               Platform Marketplace
             </h4>
             <ul className="space-y-2.5 text-sm">
@@ -82,7 +82,7 @@ export default function Footer() {
 
           {/* Col 3: For Users */}
           <div>
-            <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-4 font-['Syne']">
+            <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-4 font-sans">
               Who We Serve
             </h4>
             <ul className="space-y-2.5 text-sm">
@@ -116,7 +116,7 @@ export default function Footer() {
 
           {/* Col 4: Contact & Location */}
           <div>
-            <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-4 font-['Syne']">
+            <h4 className="text-sm font-bold text-white uppercase tracking-wider mb-4 font-sans">
               Contact & Support
             </h4>
             <ul className="space-y-3 text-xs sm:text-sm">
