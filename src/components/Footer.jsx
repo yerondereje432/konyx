@@ -21,8 +21,8 @@ export default function Footer() {
           {/* Col 1: Brand Info */}
           <div className="lg:col-span-2">
             <Link to="/" className="flex items-center gap-3 mb-4 group">
-              <div className="w-10 h-10 rounded-xl overflow-hidden bg-white flex items-center justify-center p-1 shadow-lg shadow-[#1D06F4]/30 border border-[#1D06F4]/40">
-                <img src={konyxLogo} alt="Konyx Logo" className="w-full h-full object-contain" />
+              <div className="w-10 h-10 rounded-xl overflow-hidden bg-white flex items-center justify-center p-1 shadow-lg shadow-[#1D06F4]/30 border border-[#1D06F4]/40" style={{ width: 40, height: 40, minWidth: 40, minHeight: 40 }}>
+                <img src={konyxLogo} alt="Konyx Logo" className="w-full h-full object-contain" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
               </div>
               <span className="font-bold text-2xl tracking-tight text-white flex items-center gap-1 font-['Syne']">
                 KONYX
