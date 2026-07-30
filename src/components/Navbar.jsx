@@ -56,7 +56,7 @@ export default function Navbar() {
             <img src={konyxLogo} alt="Konyx Logo" className="w-full h-full object-contain" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
           </div>
           <div className="flex flex-col">
-            <span className="font-bold text-xl tracking-tight text-white flex items-center gap-1 font-['Syne']">
+            <span className="font-extrabold text-xl tracking-tight text-white flex items-center gap-1 font-sans">
               KONYX
               <span className="w-2 h-2 rounded-full bg-[#00E5FF] inline-block animate-pulse"></span>
             </span>
