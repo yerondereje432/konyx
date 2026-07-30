@@ -52,8 +52,8 @@ export default function Navbar() {
       <div className="container mx-auto px-4 flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-xl overflow-hidden bg-white flex items-center justify-center p-1 shadow-lg shadow-[#1D06F4]/30 border border-[#1D06F4]/40 transition-transform duration-300 group-hover:scale-105">
-            <img src={konyxLogo} alt="Konyx Logo" className="w-full h-full object-contain" />
+          <div className="w-10 h-10 rounded-xl overflow-hidden bg-white flex items-center justify-center p-1 shadow-lg shadow-[#1D06F4]/30 border border-[#1D06F4]/40 transition-transform duration-300 group-hover:scale-105" style={{ width: 40, height: 40, minWidth: 40, minHeight: 40 }}>
+            <img src={konyxLogo} alt="Konyx Logo" className="w-full h-full object-contain" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
           </div>
           <div className="flex flex-col">
             <span className="font-bold text-xl tracking-tight text-white flex items-center gap-1 font-['Syne']">
