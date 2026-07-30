@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 :root {
   --color-bg: #0A0D14; /* Deep Obsidian Tech Dark Mode */
   --color-bg-alt: #0F1420;
