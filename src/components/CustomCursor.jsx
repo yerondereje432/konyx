@@ -9,7 +9,6 @@ export default function CustomCursor() {
     const updateMousePosition = e => setMousePosition({ x: e.clientX, y: e.clientY });
     
     const handleMouseOver = e => {
-      // Check if the user is hovering over a clickable element
       if (['A', 'BUTTON', 'INPUT', 'SELECT', 'TEXTAREA'].includes(e.target.tagName) || e.target.closest('a, button')) {
         setIsHovering(true);
       } else {
@@ -34,39 +33,24 @@ export default function CustomCursor() {
             cursor: none !important;
           }
         }
-        @media (max-width: 768px) {
-          .aura-cursor { display: none !important; }
-        }
       `}</style>
       <motion.div
-        className="aura-cursor"
+        className="hidden lg:flex pointer-events-none fixed top-0 left-0 z-[99999] items-center justify-center rounded-full border border-[#00E5FF]/80 transition-colors"
         animate={{ 
-          x: mousePosition.x - (isHovering ? 24 : 16), 
-          y: mousePosition.y - (isHovering ? 24 : 16), 
-          scale: isHovering ? 1.5 : 1 
+          x: mousePosition.x - (isHovering ? 20 : 14), 
+          y: mousePosition.y - (isHovering ? 20 : 14), 
+          scale: isHovering ? 1.4 : 1 
         }}
-        transition={{ type: 'spring', stiffness: 500, damping: 28, mass: 0.5 }}
+        transition={{ type: 'spring', stiffness: 600, damping: 32, mass: 0.5 }}
         style={{ 
-          position: 'fixed', 
-          top: 0, left: 0, 
-          width: isHovering ? 48 : 32, 
-          height: isHovering ? 48 : 32, 
-          border: '1.5px solid var(--color-accent)', 
-          borderRadius: '50%', 
-          pointerEvents: 'none', 
-          zIndex: 99999, 
-          backgroundColor: isHovering ? 'rgba(184, 146, 90, 0.15)' : 'transparent', 
-          backdropFilter: isHovering ? 'blur(2px)' : 'none',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: 'var(--color-accent)',
-          fontSize: '10px',
-          fontWeight: 'bold',
-          letterSpacing: '1px'
+          width: isHovering ? 40 : 28, 
+          height: isHovering ? 40 : 28, 
+          backgroundColor: isHovering ? 'rgba(29, 6, 244, 0.25)' : 'transparent', 
+          backdropFilter: isHovering ? 'blur(4px)' : 'none',
+          boxShadow: isHovering ? '0 0 20px rgba(0, 229, 255, 0.4)' : 'none'
         }}
       >
-        {isHovering && <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }}></motion.span>}
+        {isHovering && <div className="w-2 h-2 rounded-full bg-[#00E5FF]"></div>}
       </motion.div>
     </>
   );

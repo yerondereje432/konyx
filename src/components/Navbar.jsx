@@ -1,257 +1,169 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-
-// Dropdown Mega Menu NavItem Component
-const NavItem = ({ title, to, dropdownLinks, featured, isScrolled }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const isHash = to.startsWith('/#');
-  const textColor = isScrolled ? 'var(--color-text)' : '#fff';
-
-  return (
-    <div 
-      style={{ position: 'relative', display: 'flex', alignItems: 'center', height: '100%', padding: '0.5rem 0', cursor: 'pointer' }}
-      onMouseEnter={() => setIsOpen(true)}
-      onMouseLeave={() => setIsOpen(false)}
-    >
-      {isHash ? (
-        <a href={to} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: textColor, textTransform: 'uppercase', fontSize: '0.8rem', letterSpacing: '1px', transition: 'color 0.3s' }}>
-          {title} {dropdownLinks && <ChevronDown size={14} style={{ transition: 'transform 0.3s', transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }} />}
-        </a>
-      ) : (
-        <Link to={to} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: textColor, textTransform: 'uppercase', fontSize: '0.8rem', letterSpacing: '1px', transition: 'color 0.3s' }}>
-          {title} {dropdownLinks && <ChevronDown size={14} style={{ transition: 'transform 0.3s', transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }} />}
-        </Link>
-      )}
-
-      {/* Hover Mega Menu */}
-      {dropdownLinks && (
-        <AnimatePresence>
-          {isOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 15 }}
-              transition={{ duration: 0.2 }}
-              style={{ 
-                position: 'absolute', 
-                top: '100%', 
-                right: '-20%', // Align heavily to the right instead of center
-                paddingTop: '1rem', // Invisible bridge to keep hover active
-                zIndex: 100
-              }}
-            >
-              <div style={{
-                backgroundColor: '#fff', 
-                width: '600px', 
-                boxShadow: '0 20px 40px rgba(0,0,0,0.08)', 
-                borderRadius: '12px', 
-                padding: '2rem',
-                border: '1px solid #eaeaea',
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                gap: '2.5rem',
-                cursor: 'default',
-                textAlign: 'left',
-                position: 'relative',
-                transform: 'translateX(0)' // Reset any internal translation
-              }}>
-                {/* Left: Link List */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <h4 style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1px', color: '#999', marginBottom: '0.75rem', borderBottom: '1px solid #eee', paddingBottom: '0.5rem' }}>
-                    {title} Options
-                  </h4>
-                  {dropdownLinks.map((item, idx) => (
-                    <a 
-                      key={idx} 
-                      href={item.link}
-                      style={{ 
-                        padding: '0.5rem 0', 
-                        color: 'var(--color-text)', 
-                        fontSize: '0.95rem', 
-                        textDecoration: 'none',
-                        transition: 'all 0.2s',
-                        display: 'flex',
-                        alignItems: 'center',
-                        fontWeight: 500
-                      }}
-                      onMouseOver={(e) => { 
-                        e.target.style.color = 'var(--color-accent)'; 
-                        e.target.style.transform = 'translateX(5px)';
-                      }}
-                      onMouseOut={(e) => { 
-                        e.target.style.color = 'var(--color-text)'; 
-                        e.target.style.transform = 'translateX(0)';
-                      }}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      {item.name}
-                    </a>
-                  ))}
-                </div>
-
-                {/* Right: Featured Image/Content */}
-                {featured && (
-                  <div style={{ borderRadius: '8px', overflow: 'hidden' }}>
-                    <img 
-                      src={featured.img} 
-                      alt={featured.title} 
-                      style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: '8px', marginBottom: '1rem' }} 
-                    />
-                    <h4 style={{ fontSize: '1.1rem', color: 'var(--color-text)', marginBottom: '0.25rem', fontFamily: 'var(--font-heading)' }}>{featured.title}</h4>
-                    <p style={{ fontSize: '0.85rem', color: '#666', lineHeight: 1.4, margin: 0 }}>{featured.desc}</p>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      )}
-    </div>
-  );
-};
+import { 
+  Menu, 
+  X, 
+  Sparkles, 
+  UserCheck, 
+  Briefcase, 
+  Search, 
+  Users, 
+  PlusCircle, 
+  Info, 
+  CreditCard 
+} from 'lucide-react';
+import konyxLogo from '../assets/konyx-logo.jpg';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
-  const isHome = location.pathname === '/';
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 50) {
+      if (window.scrollY > 20) {
         setScrolled(true);
       } else {
         setScrolled(false);
       }
     };
-
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Force text to be dark if scrolled, not on home page, OR if mobile menu is open
-  const isScrolledText = scrolled || !isHome || mobileMenuOpen;
-  
-  const navClass = `fixed w-full z-50 transition-all duration-500 ${
-    isScrolledText ? 'bg-white shadow-sm py-4 text-black' : 'bg-transparent py-6 text-white'
-  }`;
+  const navLinks = [
+    { name: 'Find Jobs', href: '/jobs', icon: Search },
+    { name: 'Browse Talent', href: '/talent', icon: Users },
+    { name: 'Pricing & Badges', href: '/pricing', icon: CreditCard },
+    { name: 'About Konyx', href: '/about', icon: Info },
+  ];
+
+  const isActive = (path) => location.pathname === path;
 
   return (
-    <>
-      <header className={navClass} style={{ paddingLeft: '2rem', paddingRight: '2rem', position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, transition: 'var(--transition-smooth)' }}>
-        <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0' }}>
-          
-          <Link to="/" onClick={() => setMobileMenuOpen(false)} style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', fontWeight: 700, letterSpacing: '2px', color: isScrolledText ? 'var(--color-text)' : '#fff', position: 'relative', zIndex: 51 }}>
-            AURA<span style={{ color: 'var(--color-accent)' }}>DECOR</span>
-          </Link>
+    <header 
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled 
+          ? 'bg-[#0B0E14]/90 backdrop-blur-md border-b border-white/10 py-3 shadow-2xl' 
+          : 'bg-[#0B0E14]/70 backdrop-blur-sm border-b border-white/5 py-5'
+      }`}
+    >
+      <div className="container mx-auto px-4 flex items-center justify-between">
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-3 group">
+          <div className="w-10 h-10 rounded-xl overflow-hidden bg-white flex items-center justify-center p-1 shadow-lg shadow-[#1D06F4]/30 border border-[#1D06F4]/40 transition-transform duration-300 group-hover:scale-105">
+            <img src={konyxLogo} alt="Konyx Logo" className="w-full h-full object-contain" />
+          </div>
+          <div className="flex flex-col">
+            <span className="font-bold text-xl tracking-tight text-white flex items-center gap-1 font-['Syne']">
+              KONYX
+              <span className="w-2 h-2 rounded-full bg-[#00E5FF] inline-block animate-pulse"></span>
+            </span>
+            <span className="text-[10px] uppercase tracking-widest text-slate-400 font-medium">
+              Ethiopian Talent Network
+            </span>
+          </div>
+        </Link>
 
-          {/* Mobile Toggle Button */}
-          <button 
-            className="mobile-toggle"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            style={{ 
-              background: 'transparent', 
-              border: 'none', 
-              color: isScrolledText ? 'var(--color-text)' : '#fff',
-              cursor: 'pointer',
-              position: 'relative',
-              zIndex: 51
-            }}
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center gap-7">
+          {navLinks.map((link) => {
+            const Icon = link.icon;
+            const active = isActive(link.href);
+            return (
+              <Link
+                key={link.name}
+                to={link.href}
+                className={`text-sm font-medium transition-colors py-1 flex items-center gap-1.5 relative ${
+                  active ? 'text-[#00E5FF] font-semibold' : 'text-slate-300 hover:text-white'
+                }`}
+              >
+                <Icon className="w-4 h-4 text-slate-400" />
+                {link.name}
+                {active && (
+                  <span className="absolute bottom-[-6px] left-0 w-full h-[2px] bg-gradient-to-r from-[#1D06F4] to-[#00E5FF]"></span>
+                )}
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Action Buttons for Platform (Seeker & Employer) */}
+        <div className="hidden lg:flex items-center gap-3">
+          <Link
+            to="/register"
+            className="text-sm font-medium text-slate-200 hover:text-white px-4 py-2 rounded-xl hover:bg-white/5 border border-white/10 transition-all flex items-center gap-1.5"
           >
-            {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
-          </button>
-
-          {/* Desktop Nav */}
-          <nav style={{ display: 'flex', gap: '2.5rem', alignItems: 'center' }} className="desktop-nav">
-            <NavItem title="Home" to="/" isScrolled={isScrolledText} />
-            
-            <NavItem 
-              title="Services" 
-              to="/#services" 
-              isScrolled={isScrolledText} 
-              dropdownLinks={[
-                { name: 'Wedding Decoration', link: '/#services' },
-                { name: 'Corporate Events', link: '/#services' },
-                { name: 'Birthday & Social', link: '/#services' },
-                { name: 'Custom Stage Design', link: '/#services' }
-              ]}
-              featured={{
-                img: '/service-1.jpg',
-                title: 'Flawless Execution',
-                desc: 'Discover our premium setups that turn ordinary venues into magical experiences.'
-              }}
-            />
-            
-            <NavItem title="Gallery" to="/#gallery" isScrolled={isScrolledText} />
-            
-            <NavItem 
-              title="Packages" 
-              to="/#packages" 
-              isScrolled={isScrolledText} 
-              dropdownLinks={[
-                { name: 'Essential Package', link: '/#packages' },
-                { name: 'Signature Package', link: '/#packages' },
-                { name: 'Complete Event', link: '/#packages' }
-              ]}
-              featured={{
-                img: '/gallery-1.jpg',
-                title: 'Signature Package',
-                desc: 'Our most popular choice, offering a comprehensive styling experience for your special day.'
-              }}
-            />
-
-            <Link to="/quote" className="btn btn-primary" style={{ padding: '0.75rem 1.5rem', marginLeft: '0.5rem' }}>Request Quote</Link>
-          </nav>
-
+            <UserCheck className="w-4 h-4 text-[#00E5FF]" />
+            Join as Seeker
+          </Link>
+          <Link
+            to="/post-job"
+            className="btn btn-primary text-sm font-semibold px-5 py-2.5 rounded-xl shadow-lg shadow-[#1D06F4]/40 flex items-center gap-2"
+          >
+            <PlusCircle className="w-4 h-4" />
+            Post a Job
+          </Link>
         </div>
-      </header>
 
-      {/* Mobile Slide-down Menu */}
+        {/* Mobile Menu Button */}
+        <button
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="md:hidden p-2 rounded-lg bg-white/5 text-white hover:bg-white/10 transition-colors"
+          aria-label="Toggle Menu"
+        >
+          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        </button>
+      </div>
+
+      {/* Mobile Menu Drawer */}
       <AnimatePresence>
         {mobileMenuOpen && (
-          <motion.div 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="mobile-menu"
-            style={{
-              position: 'fixed',
-              top: '70px',
-              left: 0,
-              right: 0,
-              backgroundColor: '#fff',
-              padding: '2rem',
-              boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
-              zIndex: 49,
-              borderTop: '1px solid #f0f0f0',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '1.5rem'
-            }}
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.25 }}
+            className="md:hidden bg-[#0F1420] border-b border-white/10 px-6 py-6 shadow-2xl"
           >
-            <Link to="/" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: '1.2rem', color: 'var(--color-text)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 600 }}>Home</Link>
-            <a href="/#services" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: '1.2rem', color: 'var(--color-text)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 600 }}>Services</a>
-            <a href="/#gallery" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: '1.2rem', color: 'var(--color-text)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 600 }}>Gallery</a>
-            <a href="/#packages" onClick={() => setMobileMenuOpen(false)} style={{ fontSize: '1.2rem', color: 'var(--color-text)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 600 }}>Packages</a>
-            
-            <div style={{ marginTop: '1rem', paddingTop: '1.5rem', borderTop: '1px solid #eee' }}>
-              <Link to="/quote" onClick={() => setMobileMenuOpen(false)} className="btn btn-primary" style={{ width: '100%', padding: '1rem' }}>Request Quote</Link>
+            <div className="flex flex-col gap-3">
+              {navLinks.map((link) => {
+                const Icon = link.icon;
+                return (
+                  <Link
+                    key={link.name}
+                    to={link.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="text-base font-medium text-slate-200 hover:text-[#00E5FF] transition-colors py-2.5 border-b border-white/5 flex items-center gap-2"
+                  >
+                    <Icon className="w-4 h-4 text-[#00E5FF]" />
+                    {link.name}
+                  </Link>
+                );
+              })}
+              <div className="flex flex-col gap-3 pt-4">
+                <Link
+                  to="/register"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full py-3 text-center text-sm font-medium text-white bg-white/10 rounded-xl flex items-center justify-center gap-2"
+                >
+                  <UserCheck className="w-4 h-4 text-[#00E5FF]" />
+                  Join as Job Seeker
+                </Link>
+                <Link
+                  to="/post-job"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="btn btn-primary w-full py-3 justify-center"
+                >
+                  <PlusCircle className="w-4 h-4" />
+                  Post a Job Vacancy
+                </Link>
+              </div>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-
-      <style>{`
-        @media (min-width: 769px) {
-          .mobile-toggle { display: none !important; }
-          .mobile-menu { display: none !important; }
-        }
-        @media (max-width: 768px) {
-          .desktop-nav { display: none !important; }
-        }
-      `}</style>
-    </>
+    </header>
   );
 }
