@@ -11,11 +11,11 @@ import {
   Sparkles, 
   Users, 
   GraduationCap, 
-  ShieldCheck,
-  TrendingUp,
-  CreditCard,
-  PlusCircle,
-  UserCheck
+  ShieldCheck, 
+  TrendingUp, 
+  CreditCard, 
+  PlusCircle, 
+  UserCheck 
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -101,11 +101,11 @@ export default function Home() {
   ];
 
   return (
-    <div className="bg-[#0A0D14] min-h-screen">
+    <div className="bg-[#0A0D14] min-h-screen overflow-x-hidden">
       {/* 1. PLATFORM HERO WITH LIVE SEARCH ENGINE */}
-      <section className="relative pt-32 pb-20 overflow-hidden">
+      <section className="relative pt-32 pb-24 overflow-hidden">
         {/* Subtle Background Glow */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-gradient-to-tr from-[#1D06F4]/30 via-[#3B28FF]/20 to-transparent rounded-full blur-[120px] pointer-events-none -z-10"></div>
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[650px] bg-gradient-to-tr from-[#1D06F4]/25 via-[#3B28FF]/15 to-transparent rounded-full blur-[120px] pointer-events-none -z-10"></div>
         <div className="absolute top-3/4 right-10 w-[400px] h-[400px] bg-gradient-to-tr from-[#00E5FF]/20 to-[#1D06F4]/10 rounded-full blur-[100px] pointer-events-none -z-10"></div>
 
         <div className="container mx-auto px-4">
@@ -126,7 +126,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight leading-[1.08] mb-6 font-['Syne']"
+              className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.12] mb-6 text-white font-sans"
             >
               Connect. Match. Succeed. <br />
               <span className="bg-gradient-to-r from-white via-slate-200 to-[#00E5FF] bg-clip-text text-transparent">
@@ -138,57 +138,61 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-lg sm:text-xl text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed font-normal"
+              className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed font-normal"
             >
               The digital employment platform that connects university students, skilled professionals, and employers with <span className="text-[#00E5FF] font-semibold">algorithmic skill matching</span>, verified achievement badges, 2-way reviews, and local payment integration.
             </motion.p>
 
-            {/* Interactive Search Engine Bar */}
+            {/* Interactive Search Engine Bar (Spacious, Zero Overlap Flexbox) */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="bg-[#131A29]/95 border border-white/15 rounded-2xl p-4 sm:p-5 shadow-2xl max-w-3xl mx-auto mb-6"
+              className="bg-[#131A29]/95 border border-white/15 rounded-2xl p-5 shadow-2xl max-w-3xl mx-auto mb-6"
             >
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
-                <div className="md:col-span-2 relative">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {/* Search Keyword Input Box */}
+                <div className="md:col-span-2 flex items-center bg-[#0B0E14] border border-white/15 rounded-xl px-4 py-3.5 focus-within:border-[#00E5FF] transition-all">
+                  <Search className="w-5 h-5 text-slate-400 shrink-0 mr-3" />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Role, skill (e.g. React, Accounting), or company..."
-                    className="w-full bg-[#0B0E14] border border-white/10 rounded-xl pl-12 pr-4 py-3.5 text-sm sm:text-base text-white placeholder-slate-500 focus:outline-none focus:border-[#00E5FF]"
+                    placeholder="Search role, skill (e.g. React, Accounting), or company..."
+                    className="w-full bg-transparent text-sm sm:text-base text-white placeholder-slate-500 focus:outline-none"
                   />
                 </div>
 
-                <div>
+                {/* Location Select Box */}
+                <div className="flex items-center bg-[#0B0E14] border border-white/15 rounded-xl px-4 py-3.5 focus-within:border-[#00E5FF] transition-all">
+                  <MapPin className="w-5 h-5 text-slate-400 shrink-0 mr-2" />
                   <select
                     value={locationQuery}
                     onChange={(e) => setLocationQuery(e.target.value)}
-                    className="w-full bg-[#0B0E14] border border-white/10 rounded-xl px-4 py-3.5 text-sm sm:text-base text-white focus:outline-none focus:border-[#00E5FF]"
+                    className="w-full bg-transparent text-sm sm:text-base text-white focus:outline-none cursor-pointer"
                   >
-                    <option value="All">All Ethiopia</option>
-                    <option value="Addis Ababa">Addis Ababa</option>
-                    <option value="Haramaya">Haramaya Campus</option>
-                    <option value="Maya City">Maya City, Oromia</option>
-                    <option value="Hawassa">Hawassa</option>
-                    <option value="Remote">Remote</option>
+                    <option value="All" className="bg-[#0B0E14]">All Ethiopia</option>
+                    <option value="Addis Ababa" className="bg-[#0B0E14]">Addis Ababa</option>
+                    <option value="Haramaya" className="bg-[#0B0E14]">Haramaya Campus</option>
+                    <option value="Maya City" className="bg-[#0B0E14]">Maya City, Oromia</option>
+                    <option value="Hawassa" className="bg-[#0B0E14]">Hawassa</option>
+                    <option value="Remote" className="bg-[#0B0E14]">Remote</option>
                   </select>
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              {/* Dual Search CTAs */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
                 <button
                   onClick={handleSearchJobs}
-                  className="btn btn-primary w-full sm:flex-1 py-3.5 justify-center text-sm font-bold shadow-lg shadow-[#1D06F4]/40"
+                  className="btn btn-primary w-full py-3.5 justify-center text-sm font-bold shadow-lg shadow-[#1D06F4]/40"
                 >
                   <Briefcase className="w-4 h-4 mr-1.5" />
                   Search Verified Jobs
                 </button>
                 <button
                   onClick={handleSearchTalent}
-                  className="btn btn-outline w-full sm:flex-1 py-3.5 justify-center text-sm font-bold"
+                  className="btn btn-outline w-full py-3.5 justify-center text-sm font-bold border-white/20 hover:border-[#00E5FF]"
                 >
                   <Users className="w-4 h-4 mr-1.5 text-[#00E5FF]" />
                   Search Verified Candidates
@@ -213,10 +217,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 2. PLATFORM STATS BAR */}
-      <section className="border-y border-white/10 bg-[#0F1420]/60 py-10">
+      {/* 2. PLATFORM STATS BAR (4-Column Horizontal Grid) */}
+      <section className="border-y border-white/10 bg-[#0F1420]/70 py-12">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-6xl mx-auto">
             {[
               { label: 'University Students & Job Seekers', value: '10,000+', icon: GraduationCap },
               { label: 'Verified Ethiopian Employers', value: '500+', icon: ShieldCheck },
@@ -225,15 +229,18 @@ export default function Home() {
             ].map((stat) => {
               const Icon = stat.icon;
               return (
-                <div key={stat.label} className="text-center">
-                  <div className="w-10 h-10 rounded-xl bg-[#1D06F4]/20 text-[#00E5FF] flex items-center justify-center mx-auto mb-3 border border-[#1D06F4]/40">
-                    <Icon className="w-5 h-5" />
+                <div 
+                  key={stat.label} 
+                  className="bg-[#131A29]/90 border border-white/10 rounded-2xl p-6 text-center hover:border-[#1D06F4]/50 transition-all flex flex-col items-center justify-center"
+                >
+                  <div className="w-12 h-12 rounded-2xl bg-[#1D06F4]/20 border border-[#1D06F4]/40 text-[#00E5FF] flex items-center justify-center mb-4">
+                    <Icon className="w-6 h-6" />
                   </div>
-                  <div className="text-2xl sm:text-3xl font-extrabold text-white font-['Syne'] mb-1">
+                  <div className="text-3xl sm:text-4xl font-extrabold text-white mb-1 font-sans">
                     {stat.value}
                   </div>
-                  <div className="text-xs font-medium text-slate-400">{stat.label}</div>
-                  {stat.sub && <div className="text-[10px] text-slate-500 mt-0.5">{stat.sub}</div>}
+                  <div className="text-sm font-semibold text-slate-300">{stat.label}</div>
+                  {stat.sub && <div className="text-xs text-slate-500 mt-1">{stat.sub}</div>}
                 </div>
               );
             })}
@@ -249,7 +256,7 @@ export default function Home() {
               <span className="text-xs font-bold uppercase tracking-widest text-[#00E5FF] mb-1 block">
                 Live Vacancies Feed
               </span>
-              <h2 className="text-2xl sm:text-4xl font-bold text-white font-['Syne']">
+              <h2 className="text-2xl sm:text-4xl font-extrabold text-white font-sans">
                 Recent Verified Opportunities
               </h2>
             </div>
@@ -293,7 +300,7 @@ export default function Home() {
                     {job.skills.map((s) => (
                       <span
                         key={s}
-                        className="text-xs px-2 py-0.5 rounded-md bg-[#0B0E14] text-slate-300 border border-white/5"
+                        className="text-xs px-2.5 py-0.5 rounded-md bg-[#0B0E14] text-slate-300 border border-white/5"
                       >
                         {s}
                       </span>
@@ -302,7 +309,7 @@ export default function Home() {
                 </div>
 
                 <div className="pt-4 border-t border-white/10 flex items-center justify-between">
-                  <span className="text-sm font-bold text-white font-['Syne']">
+                  <span className="text-sm font-bold text-white font-sans">
                     {job.salary}
                   </span>
                   <span className="text-xs font-bold text-[#00E5FF] flex items-center gap-1">
@@ -323,7 +330,7 @@ export default function Home() {
               <span className="text-xs font-bold uppercase tracking-widest text-[#00E5FF] mb-1 block">
                 For Employers & Businesses
               </span>
-              <h2 className="text-2xl sm:text-4xl font-bold text-white font-['Syne']">
+              <h2 className="text-2xl sm:text-4xl font-extrabold text-white font-sans">
                 Featured Verified Ethiopian Talent
               </h2>
             </div>
@@ -365,7 +372,7 @@ export default function Home() {
                     {cand.skills.map((s) => (
                       <span
                         key={s}
-                        className="text-xs px-2 py-0.5 rounded-md bg-[#0B0E14] text-slate-300 border border-white/5"
+                        className="text-xs px-2.5 py-0.5 rounded-md bg-[#0B0E14] text-slate-300 border border-white/5"
                       >
                         {s}
                       </span>
@@ -374,7 +381,7 @@ export default function Home() {
                 </div>
 
                 <div className="pt-4 border-t border-white/10 flex items-center justify-between">
-                  <span className="text-sm font-bold text-white font-['Syne']">
+                  <span className="text-sm font-bold text-white font-sans">
                     {cand.rate}
                   </span>
                   <span className="text-xs font-bold text-[#00E5FF] flex items-center gap-1">
@@ -394,7 +401,7 @@ export default function Home() {
             <span className="text-xs font-bold uppercase tracking-widest text-[#00E5FF] mb-2 block">
               Why Konyx
             </span>
-            <h2 className="text-3xl sm:text-5xl font-bold text-white font-['Syne']">
+            <h2 className="text-3xl sm:text-5xl font-extrabold text-white font-sans">
               Engineered for Both Sides of the Market
             </h2>
           </div>
@@ -409,7 +416,7 @@ export default function Home() {
                 <span className="text-xs font-bold text-[#00E5FF] uppercase tracking-wider block mb-1">
                   For Students & Job Seekers
                 </span>
-                <h3 className="text-2xl font-bold text-white font-['Syne'] mb-3">
+                <h3 className="text-2xl font-bold text-white font-sans mb-3">
                   Verify Skills & Get Discovered
                 </h3>
                 <p className="text-sm text-slate-300 leading-relaxed mb-6">
@@ -449,7 +456,7 @@ export default function Home() {
                 <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider block mb-1">
                   For Employers & SMEs
                 </span>
-                <h3 className="text-2xl font-bold text-white font-['Syne'] mb-3">
+                <h3 className="text-2xl font-bold text-white font-sans mb-3">
                   Hire Vetted Talent in 3 Minutes
                 </h3>
                 <p className="text-sm text-slate-300 leading-relaxed mb-6">
